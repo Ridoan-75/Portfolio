@@ -565,6 +565,7 @@ export default function Hero() {
           align-items: center;
           justify-content: center;
           opacity: 0;
+          padding: 20px 34px;
         }
 
         /* Big decorative text behind */
@@ -862,6 +863,7 @@ export default function Hero() {
 
           .hero-right-col {
             order: -1;
+            padding: 20px 30px;
           }
 
           .hero-left-col {
@@ -947,13 +949,13 @@ export default function Hero() {
           }
 
           .hero-badge-top {
-            right: -16px;
-            top: -10px;
+            right: 0px;
+            top: -6px;
           }
 
           .hero-badge-bottom {
-            left: -16px;
-            bottom: -10px;
+            left: 0px;
+            bottom: -6px;
           }
 
           .hero-badge-label {
@@ -994,6 +996,10 @@ export default function Hero() {
           #home {
             padding: 50px 18px 80px;
             padding-top: 70px;
+          }
+
+          .hero-right-col {
+            padding: 18px 24px;
           }
 
           .hero-inner {
@@ -1077,13 +1083,13 @@ export default function Hero() {
           }
 
           .hero-badge-top {
-            right: -10px;
-            top: -8px;
+            right: 0px;
+            top: -4px;
           }
 
           .hero-badge-bottom {
-            left: -10px;
-            bottom: -8px;
+            left: 0px;
+            bottom: -4px;
           }
 
           .hero-track-left { left: -14px; }
@@ -1129,6 +1135,10 @@ export default function Hero() {
           #home {
             padding: 40px 14px 70px;
             padding-top: 60px;
+          }
+
+          .hero-right-col {
+            padding: 16px 20px;
           }
 
           .hero-inner {
@@ -1206,13 +1216,13 @@ export default function Hero() {
           }
 
           .hero-badge-top {
-            right: -6px;
-            top: -6px;
+            right: 4px;
+            top: -2px;
           }
 
           .hero-badge-bottom {
-            left: -6px;
-            bottom: -6px;
+            left: 4px;
+            bottom: -2px;
           }
 
           .hero-badge-label {
