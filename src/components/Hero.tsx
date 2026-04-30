@@ -110,7 +110,6 @@ export default function Hero() {
   const typedRef = useRef<HTMLSpanElement>(null);
   const cursorRef = useRef<HTMLSpanElement>(null);
 
-  // Typing animation
   useEffect(() => {
     let ri = 0,
       ci = 0,
@@ -147,7 +146,6 @@ export default function Hero() {
     };
   }, []);
 
-  // Cursor blink
   useEffect(() => {
     if (!cursorRef.current) return;
     gsap.to(cursorRef.current, {
@@ -159,7 +157,6 @@ export default function Hero() {
     });
   }, []);
 
-  // GSAP entrance
   useEffect(() => {
     gsap.fromTo(
       ".hero-status-tag",
@@ -254,7 +251,6 @@ export default function Hero() {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        padding: "80px 60px 80px",
         background: "#080808",
         color: "#e8e4dc",
         position: "relative",
@@ -264,6 +260,11 @@ export default function Hero() {
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+        /* ===== BASE / DESKTOP (1200px+) ===== */
+        #home {
+          padding: 80px 60px 80px;
+        }
 
         /* Grid background */
         #home::before {
@@ -373,7 +374,7 @@ export default function Hero() {
         /* Main Heading */
         .hero-heading {
           font-family: 'Bebas Neue', sans-serif;
-          font-size: clamp(72px, 10vw, 120px);
+          font-size: clamp(56px, 10vw, 120px);
           line-height: .92;
           letter-spacing: .02em;
           color: #f0ece4;
@@ -394,6 +395,7 @@ export default function Hero() {
           display: flex;
           align-items: center;
           gap: 12px;
+          flex-wrap: wrap;
           opacity: 0;
         }
 
@@ -413,6 +415,7 @@ export default function Hero() {
           margin-bottom: 24px;
           min-height: 20px;
           opacity: 0;
+          word-break: break-word;
         }
 
         .hero-typed { color: #c8f060; font-weight: 600; }
@@ -496,6 +499,7 @@ export default function Hero() {
           align-items: center;
           gap: 8px;
           transition: background .2s, transform .15s;
+          white-space: nowrap;
         }
 
         .hero-btn-primary:hover { background: #d4f577; transform: translateY(-2px); }
@@ -517,11 +521,12 @@ export default function Hero() {
           align-items: center;
           gap: 8px;
           transition: border-color .2s, color .2s, transform .15s;
+          white-space: nowrap;
         }
 
         .hero-btn-secondary:hover { border-color: #c8f060; color: #c8f060; transform: translateY(-2px); }
 
-        /* Social label — bigger & brighter */
+        /* Social label */
         .hero-social-label {
           font-family: 'JetBrains Mono', monospace;
           font-size: 13px;
@@ -531,7 +536,7 @@ export default function Hero() {
           margin-bottom: 12px;
         }
 
-        /* Social icons — bigger & visible */
+        /* Social icons */
         .hero-socials { display: flex; gap: 10px; flex-wrap: wrap; }
 
         .hero-social-item {
@@ -608,42 +613,6 @@ export default function Hero() {
           border-width: 0 2px 2px 0;
         }
 
-        /* Image placeholder — replace with Next.js <Image> in real use */
-        .hero-img-placeholder {
-          width: 100%; height: 100%;
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          gap: 14px;
-          background: linear-gradient(160deg, #0e0e0c 0%, #141412 100%);
-        }
-
-        .hero-img-circle {
-          width: 110px; height: 110px;
-          border-radius: 50%;
-          background: #141412;
-          border: 2px solid #2a2a28;
-          display: flex; align-items: center; justify-content: center;
-          overflow: hidden;
-        }
-
-        .hero-img-hint {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: .12em;
-          color: #2a2a28;
-          text-align: center;
-          line-height: 1.8;
-          padding: 0 20px;
-        }
-
-        .hero-img-hint span {
-          display: block;
-          color: #c8f060;
-          margin-bottom: 4px;
-          font-size: 9px;
-        }
-
         /* Track lines beside image */
         .hero-track {
           position: absolute;
@@ -712,7 +681,7 @@ export default function Hero() {
           font-size: 10px;
         }
 
-        /* Marquee strip — bigger & brighter */
+        /* Marquee strip */
         .hero-marquee-wrap {
           position: absolute;
           bottom: 0; left: 0; right: 0;
@@ -754,18 +723,699 @@ export default function Hero() {
           flex-shrink: 0;
         }
 
-        @media (max-width: 900px) {
-          .hero-inner { grid-template-columns: 1fr; gap: 40px; }
-          #home { padding: 80px 24px 100px; }
-          .hero-right-col { order: -1; }
-          .hero-heading { font-size: 80px; }
-          .hero-bg-text { font-size: 130px; }
+        /* ============================================
+           RESPONSIVE BREAKPOINTS
+           ============================================ */
+
+        /* ── LAPTOP / SMALL DESKTOP (1024px – 1199px) ── */
+        @media (max-width: 1199px) {
+          #home {
+            padding: 80px 40px 80px;
+          }
+
+          .hero-inner {
+            gap: 48px;
+            max-width: 960px;
+          }
+
+          .hero-heading {
+            font-size: clamp(52px, 8vw, 100px);
+          }
+
+          .hero-bg-text {
+            font-size: 180px;
+          }
+
+          .hero-img-frame {
+            width: 270px;
+            height: 330px;
+          }
+
+          .hero-stat-item {
+            padding: 14px 24px;
+          }
+
+          .hero-stat-num {
+            font-size: 34px;
+          }
+
+          .hero-corner-tl,
+          .hero-corner-br {
+            width: 120px;
+            height: 120px;
+          }
         }
 
-        @media (max-width: 520px) {
-          .hero-ctas { flex-direction: column; }
-          .hero-stats { width: 100%; }
-          .hero-stat-item { flex: 1; }
+        /* ── TABLET LANDSCAPE / SMALL LAPTOP (768px – 1023px) ── */
+        @media (max-width: 1023px) {
+          #home {
+            padding: 70px 32px 90px;
+          }
+
+          .hero-inner {
+            gap: 40px;
+          }
+
+          .hero-heading {
+            font-size: clamp(48px, 8vw, 80px);
+          }
+
+          .hero-bg-text {
+            font-size: 150px;
+          }
+
+          .hero-img-frame {
+            width: 240px;
+            height: 300px;
+          }
+
+          .hero-hello {
+            font-size: 20px;
+          }
+
+          .hero-desc {
+            font-size: 15px;
+            line-height: 1.75;
+          }
+
+          .hero-role-line {
+            font-size: 12px;
+          }
+
+          .hero-typing {
+            font-size: 13px;
+          }
+
+          .hero-stat-item {
+            padding: 12px 20px;
+          }
+
+          .hero-stat-num {
+            font-size: 30px;
+          }
+
+          .hero-stat-label {
+            font-size: 10px;
+          }
+
+          .hero-badge {
+            padding: 8px 12px;
+            font-size: 10px;
+          }
+
+          .hero-badge-top {
+            right: -20px;
+            top: -10px;
+          }
+
+          .hero-badge-bottom {
+            left: -20px;
+            bottom: -10px;
+          }
+
+          .hero-marquee-item {
+            font-size: 12px;
+            padding: 0 24px;
+          }
+
+          .hero-corner-tl,
+          .hero-corner-br {
+            width: 100px;
+            height: 100px;
+          }
+        }
+
+        /* ── TABLET PORTRAIT (600px – 767px) ── */
+        @media (max-width: 767px) {
+          #home {
+            padding: 60px 24px 90px;
+            min-height: 100vh;
+            justify-content: flex-start;
+            padding-top: 80px;
+          }
+
+          .hero-inner {
+            grid-template-columns: 1fr;
+            gap: 36px;
+            text-align: center;
+          }
+
+          .hero-right-col {
+            order: -1;
+          }
+
+          .hero-left-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+
+          .hero-status-tag {
+            margin-bottom: 20px;
+          }
+
+          .hero-heading {
+            font-size: clamp(52px, 14vw, 80px);
+            margin-bottom: 16px;
+          }
+
+          .hero-hello {
+            font-size: 18px;
+            margin-bottom: 6px;
+          }
+
+          .hero-role-line {
+            font-size: 11px;
+            justify-content: center;
+            margin-bottom: 14px;
+          }
+
+          .hero-typing {
+            font-size: 12px;
+            margin-bottom: 20px;
+          }
+
+          .hero-desc {
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 24px;
+          }
+
+          .hero-stats {
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 28px;
+          }
+
+          .hero-stat-item {
+            padding: 14px 22px;
+          }
+
+          .hero-stat-num {
+            font-size: 32px;
+          }
+
+          .hero-ctas {
+            justify-content: center;
+            margin-bottom: 28px;
+          }
+
+          .hero-social-label {
+            text-align: center;
+          }
+
+          .hero-socials {
+            justify-content: center;
+          }
+
+          .hero-bg-text {
+            font-size: 120px;
+          }
+
+          .hero-img-frame {
+            width: 220px;
+            height: 280px;
+          }
+
+          .hero-badge {
+            padding: 7px 10px;
+            font-size: 9px;
+          }
+
+          .hero-badge-top {
+            right: -16px;
+            top: -10px;
+          }
+
+          .hero-badge-bottom {
+            left: -16px;
+            bottom: -10px;
+          }
+
+          .hero-badge-label {
+            font-size: 9px;
+          }
+
+          .hero-badge-val {
+            font-size: 9px;
+          }
+
+          .hero-track-left { left: -16px; }
+          .hero-track-right { right: -16px; }
+
+          .hero-corner-tl,
+          .hero-corner-br {
+            width: 80px;
+            height: 80px;
+          }
+
+          .hero-scanline {
+            left: 24px;
+            right: 24px;
+          }
+
+          .hero-marquee-item {
+            font-size: 11px;
+            padding: 0 20px;
+            gap: 10px;
+          }
+
+          .hero-marquee-wrap {
+            padding: 12px 0;
+          }
+        }
+
+        /* ── MOBILE (480px – 599px) ── */
+        @media (max-width: 599px) {
+          #home {
+            padding: 50px 18px 80px;
+            padding-top: 70px;
+          }
+
+          .hero-inner {
+            gap: 30px;
+          }
+
+          .hero-heading {
+            font-size: clamp(44px, 16vw, 64px);
+            margin-bottom: 14px;
+          }
+
+          .hero-hello {
+            font-size: 16px;
+          }
+
+          .hero-role-line {
+            font-size: 10px;
+            gap: 8px;
+            letter-spacing: .06em;
+          }
+
+          .hero-role-line::before {
+            width: 20px;
+          }
+
+          .hero-typing {
+            font-size: 11px;
+          }
+
+          .hero-desc {
+            font-size: 13px;
+            line-height: 1.75;
+            max-width: 340px;
+          }
+
+          .hero-stats {
+            width: 100%;
+          }
+
+          .hero-stat-item {
+            flex: 1;
+            padding: 12px 10px;
+          }
+
+          .hero-stat-num {
+            font-size: 28px;
+          }
+
+          .hero-stat-label {
+            font-size: 9px;
+            letter-spacing: .08em;
+          }
+
+          .hero-ctas {
+            flex-direction: column;
+            width: 100%;
+            align-items: stretch;
+          }
+
+          .hero-btn-primary,
+          .hero-btn-secondary {
+            justify-content: center;
+            padding: 14px 20px;
+            font-size: 11px;
+            width: 100%;
+            box-sizing: border-box;
+          }
+
+          .hero-social-item {
+            width: 42px;
+            height: 42px;
+          }
+
+          .hero-bg-text {
+            font-size: 100px;
+          }
+
+          .hero-img-frame {
+            width: 200px;
+            height: 260px;
+          }
+
+          .hero-badge-top {
+            right: -10px;
+            top: -8px;
+          }
+
+          .hero-badge-bottom {
+            left: -10px;
+            bottom: -8px;
+          }
+
+          .hero-track-left { left: -14px; }
+          .hero-track-right { right: -14px; }
+
+          .hero-status-text {
+            font-size: 11px;
+          }
+
+          .hero-social-label {
+            font-size: 11px;
+          }
+
+          .hero-marquee-item {
+            font-size: 10px;
+            padding: 0 16px;
+            gap: 8px;
+          }
+
+          .hero-marquee-wrap {
+            padding: 10px 0;
+          }
+
+          .hero-marquee-dot {
+            width: 4px;
+            height: 4px;
+          }
+
+          .hero-corner-tl,
+          .hero-corner-br {
+            width: 60px;
+            height: 60px;
+          }
+
+          .hero-scanline {
+            left: 18px;
+            right: 18px;
+          }
+        }
+
+        /* ── SMALL MOBILE (below 380px) ── */
+        @media (max-width: 379px) {
+          #home {
+            padding: 40px 14px 70px;
+            padding-top: 60px;
+          }
+
+          .hero-inner {
+            gap: 24px;
+          }
+
+          .hero-heading {
+            font-size: clamp(38px, 18vw, 52px);
+            margin-bottom: 12px;
+          }
+
+          .hero-hello {
+            font-size: 15px;
+          }
+
+          .hero-role-line {
+            font-size: 9px;
+            gap: 6px;
+          }
+
+          .hero-role-line::before {
+            width: 16px;
+          }
+
+          .hero-typing {
+            font-size: 10px;
+          }
+
+          .hero-desc {
+            font-size: 12px;
+            line-height: 1.7;
+            max-width: 280px;
+          }
+
+          .hero-stat-item {
+            padding: 10px 8px;
+          }
+
+          .hero-stat-num {
+            font-size: 24px;
+          }
+
+          .hero-stat-label {
+            font-size: 8px;
+          }
+
+          .hero-btn-primary,
+          .hero-btn-secondary {
+            padding: 12px 16px;
+            font-size: 10px;
+          }
+
+          .hero-social-item {
+            width: 38px;
+            height: 38px;
+          }
+
+          .hero-social-item svg {
+            width: 16px;
+            height: 16px;
+          }
+
+          .hero-bg-text {
+            font-size: 80px;
+          }
+
+          .hero-img-frame {
+            width: 170px;
+            height: 220px;
+          }
+
+          .hero-badge {
+            padding: 6px 8px;
+            font-size: 8px;
+          }
+
+          .hero-badge-top {
+            right: -6px;
+            top: -6px;
+          }
+
+          .hero-badge-bottom {
+            left: -6px;
+            bottom: -6px;
+          }
+
+          .hero-badge-label {
+            font-size: 7px;
+          }
+
+          .hero-badge-val {
+            font-size: 7px;
+          }
+
+          .hero-track {
+            display: none;
+          }
+
+          .hero-status-tag {
+            padding: 5px 10px;
+            gap: 6px;
+            margin-bottom: 16px;
+          }
+
+          .hero-status-text {
+            font-size: 10px;
+          }
+
+          .hero-status-dot {
+            width: 6px;
+            height: 6px;
+          }
+
+          .hero-social-label {
+            font-size: 10px;
+          }
+
+          .hero-marquee-item {
+            font-size: 9px;
+            padding: 0 12px;
+            gap: 6px;
+          }
+
+          .hero-marquee-wrap {
+            padding: 8px 0;
+          }
+
+          .hero-corner-tl,
+          .hero-corner-br {
+            width: 40px;
+            height: 40px;
+          }
+
+          .hero-scanline {
+            left: 14px;
+            right: 14px;
+          }
+
+          .hero-ctas {
+            margin-bottom: 24px;
+          }
+        }
+
+        /* ── LANDSCAPE MOBILE (short height) ── */
+        @media (max-height: 500px) and (orientation: landscape) {
+          #home {
+            padding: 30px 32px 70px;
+            min-height: auto;
+          }
+
+          .hero-inner {
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+          }
+
+          .hero-right-col {
+            order: 0;
+          }
+
+          .hero-heading {
+            font-size: clamp(36px, 8vh, 56px);
+            margin-bottom: 10px;
+          }
+
+          .hero-hello {
+            font-size: 14px;
+            margin-bottom: 4px;
+          }
+
+          .hero-desc {
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+          }
+
+          .hero-role-line {
+            font-size: 10px;
+            margin-bottom: 10px;
+          }
+
+          .hero-typing {
+            font-size: 10px;
+            margin-bottom: 14px;
+          }
+
+          .hero-stats {
+            margin-bottom: 16px;
+          }
+
+          .hero-stat-item {
+            padding: 8px 16px;
+          }
+
+          .hero-stat-num {
+            font-size: 24px;
+          }
+
+          .hero-stat-label {
+            font-size: 8px;
+          }
+
+          .hero-ctas {
+            margin-bottom: 16px;
+            gap: 8px;
+          }
+
+          .hero-btn-primary,
+          .hero-btn-secondary {
+            padding: 10px 18px;
+            font-size: 10px;
+          }
+
+          .hero-img-frame {
+            width: 160px;
+            height: 200px;
+          }
+
+          .hero-bg-text {
+            font-size: 100px;
+          }
+
+          .hero-status-tag {
+            margin-bottom: 12px;
+            padding: 4px 10px;
+          }
+
+          .hero-social-item {
+            width: 36px;
+            height: 36px;
+          }
+
+          .hero-social-label {
+            font-size: 10px;
+            margin-bottom: 6px;
+          }
+
+          .hero-corner-tl,
+          .hero-corner-br {
+            width: 60px;
+            height: 60px;
+          }
+        }
+
+        /* ── ULTRA-WIDE / 4K (1600px+) ── */
+        @media (min-width: 1600px) {
+          .hero-inner {
+            max-width: 1300px;
+            gap: 80px;
+          }
+
+          .hero-img-frame {
+            width: 360px;
+            height: 430px;
+          }
+
+          .hero-bg-text {
+            font-size: 260px;
+          }
+
+          .hero-desc {
+            font-size: 17px;
+            max-width: 500px;
+          }
+
+          .hero-stat-item {
+            padding: 18px 36px;
+          }
+
+          .hero-stat-num {
+            font-size: 42px;
+          }
+
+          .hero-marquee-item {
+            font-size: 15px;
+            padding: 0 36px;
+          }
+        }
+
+        /* ── Touch device hover fix ── */
+        @media (hover: none) {
+          .hero-btn-primary:hover { transform: none; }
+          .hero-btn-secondary:hover { transform: none; }
+          .hero-social-item:hover { transform: none; }
+
+          .hero-btn-primary:active { transform: scale(0.96); }
+          .hero-btn-secondary:active { transform: scale(0.96); }
+          .hero-social-item:active { transform: scale(0.92); }
         }
       `}</style>
 
@@ -776,7 +1426,7 @@ export default function Hero() {
 
       <div className="hero-inner">
         {/* ── LEFT ── */}
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div className="hero-left-col" style={{ display: "flex", flexDirection: "column" }}>
           <div className="hero-status-tag">
             <span className="hero-status-dot" />
             <span className="hero-status-text">Available for Work</span>
@@ -895,7 +1545,6 @@ export default function Hero() {
           </div>
 
           {/* Image frame */}
-
           <div className="hero-img-frame">
             <Image
               src="/image.jpg"

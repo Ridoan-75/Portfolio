@@ -1,4 +1,3 @@
-// components/ScrollToTop.tsx
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -7,13 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function ScrollToTop() {
   const [visible, setVisible] = useState(false);
-  const [animating, setAnimating] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [scrollPercent, setScrollPercent] = useState(0);
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const rocketTrailRef = useRef<HTMLDivElement>(null);
+  const isScrolling = useRef(false);
 
-  // Track scroll position + visibility
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -28,64 +24,35 @@ export default function ScrollToTop() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollTop = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (animating) return;
-      setAnimating(true);
+  const scrollTop = useCallback(() => {
+    if (isScrolling.current) return;
+    isScrolling.current = true;
 
-      const overlay = overlayRef.current;
-      const trail = rocketTrailRef.current;
-      if (!overlay || !trail) return;
+    const start = window.scrollY;
+    const duration = Math.min(800, Math.max(300, start * 0.4));
+    let startTime: number | null = null;
 
-      // ── Phase 1: Rocket trail shoots up from button ──
-      trail.style.transition = "none";
-      trail.style.opacity = "1";
-      trail.style.transform = "scaleY(0)";
-      trail.getBoundingClientRect();
-      trail.style.transition =
-        "transform 0.35s cubic-bezier(0.76, 0, 0.24, 1)";
-      trail.style.transform = "scaleY(1)";
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
-      // ── Phase 2: Overlay wipe UP ──
-      setTimeout(() => {
-        overlay.style.transition = "none";
-        overlay.style.transform = "translateY(100%)";
-        overlay.getBoundingClientRect();
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutCubic(progress);
 
-        overlay.style.transition =
-          "transform 0.45s cubic-bezier(0.76, 0, 0.24, 1)";
-        overlay.style.transform = "translateY(0%)";
+      window.scrollTo(0, start * (1 - eased));
 
-        // Hide trail
-        trail.style.transition = "opacity 0.2s";
-        trail.style.opacity = "0";
-      }, 200);
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        window.scrollTo(0, 0);
+        isScrolling.current = false;
+      }
+    };
 
-      // ── Phase 3: Scroll while covered ──
-      setTimeout(() => {
-        window.scrollTo({ top: 0 });
-      }, 520);
+    requestAnimationFrame(step);
+  }, []);
 
-      // ── Phase 4: Overlay slides OFF upward ──
-      setTimeout(() => {
-        overlay.style.transition =
-          "transform 0.4s cubic-bezier(0.76, 0, 0.24, 1)";
-        overlay.style.transform = "translateY(-100%)";
-
-        setTimeout(() => {
-          overlay.style.transition = "none";
-          overlay.style.transform = "translateY(100%)";
-          trail.style.transition = "none";
-          trail.style.opacity = "0";
-          trail.style.transform = "scaleY(0)";
-          setAnimating(false);
-        }, 420);
-      }, 620);
-    },
-    [animating],
-  );
-
-  // SVG circle progress
   const circumference = 2 * Math.PI * 20;
   const strokeOffset = circumference - scrollPercent * circumference;
 
@@ -94,19 +61,9 @@ export default function ScrollToTop() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
 
-        @keyframes scrollTopPulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(200,240,96,.4); }
-          50% { box-shadow: 0 0 0 10px rgba(200,240,96,0); }
-        }
-
         @keyframes scrollTopFloat {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-5px); }
-        }
-
-        @keyframes scrollTopParticle {
-          0% { transform: translateY(0) scale(1); opacity: .7; }
-          100% { transform: translateY(-30px) scale(0); opacity: 0; }
         }
 
         .stt-btn {
@@ -125,11 +82,6 @@ export default function ScrollToTop() {
           z-index: 999;
           padding: 0;
           animation: scrollTopFloat 3s ease-in-out infinite;
-        }
-
-        .stt-btn[data-animating="true"] {
-          cursor: not-allowed;
-          animation: none;
         }
 
         .stt-btn:hover .stt-inner {
@@ -193,114 +145,62 @@ export default function ScrollToTop() {
           transform: rotate(45deg);
         }
 
-        .stt-particles {
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 20px;
-          height: 40px;
-          pointer-events: none;
-          z-index: 0;
+        /* ── Responsive ── */
+        @media (max-width: 599px) {
+          .stt-btn {
+            bottom: 20px;
+            right: 20px;
+            width: 46px;
+            height: 46px;
+          }
+
+          .stt-inner {
+            width: 36px;
+            height: 36px;
+          }
+
+          .stt-progress-ring {
+            width: 46px;
+            height: 46px;
+          }
+
+          .stt-progress-ring circle {
+            r: 18;
+            cx: 23;
+            cy: 23;
+          }
         }
 
-        .stt-particle {
-          position: absolute;
-          width: 3px;
-          height: 3px;
-          border-radius: 50%;
-          background: #c8f060;
-          bottom: 0;
-          animation: scrollTopParticle 1.2s ease-out infinite;
+        @media (max-width: 379px) {
+          .stt-btn {
+            bottom: 16px;
+            right: 16px;
+            width: 42px;
+            height: 42px;
+          }
+
+          .stt-inner {
+            width: 32px;
+            height: 32px;
+          }
+
+          .stt-progress-ring {
+            width: 42px;
+            height: 42px;
+          }
         }
 
-        .stt-particle:nth-child(1) { left: 2px; animation-delay: 0s; }
-        .stt-particle:nth-child(2) { left: 9px; animation-delay: .3s; }
-        .stt-particle:nth-child(3) { left: 16px; animation-delay: .6s; }
+        @media (hover: none) {
+          .stt-btn:hover .stt-inner { transform: none; }
+          .stt-btn:active .stt-inner { transform: scale(0.92); }
+        }
       `}</style>
-
-      {/* Rocket trail effect */}
-      <div
-        ref={rocketTrailRef}
-        style={{
-          position: "fixed",
-          bottom: 0,
-          right: 54,
-          width: 2,
-          height: "100vh",
-          background:
-            "linear-gradient(to top, #c8f060, rgba(200,240,96,.3), transparent)",
-          transformOrigin: "bottom",
-          transform: "scaleY(0)",
-          opacity: 0,
-          zIndex: 997,
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* Full-screen wipe overlay */}
-      <div
-        ref={overlayRef}
-        style={{
-          position: "fixed",
-          inset: 0,
-          transform: "translateY(100%)",
-          zIndex: 998,
-          pointerEvents: "none",
-          willChange: "transform",
-          overflow: "hidden",
-        }}
-      >
-        {/* Overlay background */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "#c8f060",
-          }}
-        />
-        {/* Grid pattern on overlay */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "linear-gradient(rgba(8,8,8,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(8,8,8,.06) 1px, transparent 1px)",
-            backgroundSize: "44px 44px",
-            pointerEvents: "none",
-          }}
-        />
-        {/* Center text on overlay */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 12,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "#080808",
-              opacity: 0.5,
-            }}
-          >
-            ↑ Back to Top
-          </span>
-        </div>
-      </div>
 
       {/* Button */}
       <AnimatePresence>
         {visible && (
           <motion.button
             className="stt-btn"
-            data-animating={animating}
             onClick={scrollTop}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
@@ -315,7 +215,6 @@ export default function ScrollToTop() {
           >
             {/* Progress ring */}
             <svg className="stt-progress-ring" viewBox="0 0 52 52">
-              {/* Track */}
               <circle
                 cx="26"
                 cy="26"
@@ -324,7 +223,6 @@ export default function ScrollToTop() {
                 stroke="rgba(200,240,96,.12)"
                 strokeWidth="2"
               />
-              {/* Progress */}
               <circle
                 cx="26"
                 cy="26"
@@ -343,12 +241,12 @@ export default function ScrollToTop() {
             <div className="stt-inner">
               <motion.div
                 animate={
-                  hovered && !animating
+                  hovered
                     ? { y: [0, -3, 0] }
                     : { y: 0 }
                 }
                 transition={
-                  hovered && !animating
+                  hovered
                     ? { duration: 0.6, repeat: Infinity, ease: "easeInOut" }
                     : {}
                 }
@@ -357,20 +255,9 @@ export default function ScrollToTop() {
               </motion.div>
             </div>
 
-            {/* Hover particles */}
-            <AnimatePresence>
-              {hovered && !animating && (
-                <div className="stt-particles">
-                  <span className="stt-particle" />
-                  <span className="stt-particle" />
-                  <span className="stt-particle" />
-                </div>
-              )}
-            </AnimatePresence>
-
             {/* Tooltip on hover */}
             <AnimatePresence>
-              {hovered && !animating && (
+              {hovered && (
                 <motion.div
                   className="stt-label"
                   initial={{ opacity: 0, y: 5 }}

@@ -16,7 +16,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "MD RIDOAN HOSSEN - Portfolio",
-  description: "React & Next.js Developer Portfolio",
+  description: "Full Stack Developer Portfolio",
 };
 
 export default function RootLayout({
