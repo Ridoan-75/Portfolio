@@ -1497,7 +1497,7 @@ export default function Hero() {
               Hire Me
             </a>
             <a
-              href="/resume.pdf"
+              href="/Resume.pdf"
               download
               className="hero-btn-secondary"
               onClick={handleBtnClick}
