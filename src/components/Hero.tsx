@@ -78,7 +78,8 @@ const marqueeItems = [
 ];
 
 function firework(x: number, y: number) {
-  const colors = ["#c8f060", "#a3e635", "#ffffff", "#6a6a62"];
+  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#c8f060";
+  const colors = [accent, "#ffffff", "#6a6a62"];
   for (let i = 0; i < 16; i++) {
     const dot = document.createElement("span");
     Object.assign(dot.style, {
@@ -272,8 +273,8 @@ export default function Hero() {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(200,240,96,.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(200,240,96,.04) 1px, transparent 1px);
+            linear-gradient(rgba(var(--accent-rgb),.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(var(--accent-rgb),.04) 1px, transparent 1px);
           background-size: 44px 44px;
           pointer-events: none;
           z-index: 0;
@@ -283,8 +284,8 @@ export default function Hero() {
           position: absolute;
           top: 0; left: 0;
           width: 180px; height: 180px;
-          border-right: 1px solid rgba(200,240,96,.08);
-          border-bottom: 1px solid rgba(200,240,96,.08);
+          border-right: 1px solid rgba(var(--accent-rgb),.08);
+          border-bottom: 1px solid rgba(var(--accent-rgb),.08);
           pointer-events: none;
         }
 
@@ -292,8 +293,8 @@ export default function Hero() {
           position: absolute;
           bottom: 0; right: 0;
           width: 180px; height: 180px;
-          border-left: 1px solid rgba(200,240,96,.08);
-          border-top: 1px solid rgba(200,240,96,.08);
+          border-left: 1px solid rgba(var(--accent-rgb),.08);
+          border-top: 1px solid rgba(var(--accent-rgb),.08);
           pointer-events: none;
         }
 
@@ -301,7 +302,7 @@ export default function Hero() {
           position: absolute;
           left: 60px; right: 60px;
           height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(200,240,96,.12), transparent);
+          background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),.12), transparent);
           top: 50%;
           pointer-events: none;
           z-index: 0;
@@ -332,8 +333,8 @@ export default function Hero() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: rgba(200,240,96,.06);
-          border: 1px solid rgba(200,240,96,.2);
+          background: rgba(var(--accent-rgb),.06);
+          border: 1px solid rgba(var(--accent-rgb),.2);
           border-radius: 3px;
           padding: 7px 14px;
           width: fit-content;
@@ -344,8 +345,8 @@ export default function Hero() {
         .hero-status-dot {
           width: 8px; height: 8px;
           border-radius: 50%;
-          background: #c8f060;
-          box-shadow: 0 0 6px #c8f060;
+          background: var(--accent);
+          box-shadow: 0 0 6px var(--accent);
           animation: heroBlink 2s ease infinite;
           flex-shrink: 0;
         }
@@ -357,7 +358,7 @@ export default function Hero() {
           font-size: 13px;
           letter-spacing: .1em;
           text-transform: uppercase;
-          color: #c8f060;
+          color: var(--accent);
         }
 
         /* Hello line */
@@ -382,7 +383,7 @@ export default function Hero() {
           opacity: 0;
         }
 
-        .hero-heading .h-accent { color: #c8f060; }
+        .hero-heading .h-accent { color: var(--accent); }
 
         /* Role line */
         .hero-role-line {
@@ -402,7 +403,7 @@ export default function Hero() {
         .hero-role-line::before {
           content: '';
           width: 28px; height: 1px;
-          background: #c8f060;
+          background: var(--accent);
           flex-shrink: 0;
         }
 
@@ -418,12 +419,12 @@ export default function Hero() {
           word-break: break-word;
         }
 
-        .hero-typed { color: #c8f060; font-weight: 600; }
+        .hero-typed { color: var(--accent); font-weight: 600; }
 
         .hero-cursor {
           display: inline-block;
           width: 2px; height: 14px;
-          background: #c8f060;
+          background: var(--accent);
           vertical-align: middle;
           margin-left: 2px;
         }
@@ -443,8 +444,12 @@ export default function Hero() {
           display: flex;
           align-items: stretch;
           margin-bottom: 32px;
-          border: 1px solid #1a1a18;
-          border-radius: 3px;
+          background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.014) 100%);
+          border: 1px solid rgba(255,255,255,0.08);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 4px 20px rgba(0,0,0,0.28);
+          backdrop-filter: blur(14px) saturate(1.3);
+          -webkit-backdrop-filter: blur(14px) saturate(1.3);
+          border-radius: 6px;
           overflow: hidden;
           width: fit-content;
           opacity: 0;
@@ -452,7 +457,7 @@ export default function Hero() {
 
         .hero-stat-item {
           padding: 16px 30px;
-          border-right: 1px solid #1a1a18;
+          border-right: 1px solid rgba(255,255,255,0.07);
           text-align: center;
         }
 
@@ -461,7 +466,7 @@ export default function Hero() {
         .hero-stat-num {
           font-family: 'Bebas Neue', sans-serif;
           font-size: 38px;
-          color: #c8f060;
+          color: var(--accent);
           letter-spacing: .03em;
           line-height: 1;
         }
@@ -491,18 +496,18 @@ export default function Hero() {
           letter-spacing: .12em;
           text-transform: uppercase;
           color: #080808;
-          background: #c8f060;
+          background: var(--accent);
           text-decoration: none;
           padding: 14px 26px;
           border-radius: 3px;
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          transition: background .2s, transform .15s;
+          transition: filter .2s, transform .15s;
           white-space: nowrap;
         }
 
-        .hero-btn-primary:hover { background: #d4f577; transform: translateY(-2px); }
+        .hero-btn-primary:hover { filter: brightness(1.12); transform: translateY(-2px); }
         .hero-btn-primary::after { content: '→'; display: inline-block; transition: transform .2s; }
         .hero-btn-primary:hover::after { transform: translateX(3px); }
 
@@ -524,7 +529,7 @@ export default function Hero() {
           white-space: nowrap;
         }
 
-        .hero-btn-secondary:hover { border-color: #c8f060; color: #c8f060; transform: translateY(-2px); }
+        .hero-btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
 
         /* Social label */
         .hero-social-label {
@@ -552,8 +557,8 @@ export default function Hero() {
         }
 
         .hero-social-item:hover {
-          border-color: #c8f060;
-          color: #c8f060;
+          border-color: var(--accent);
+          color: var(--accent);
           background: #131310;
           transform: translateY(-3px);
         }
@@ -573,7 +578,7 @@ export default function Hero() {
           position: absolute;
           font-family: 'Bebas Neue', sans-serif;
           font-size: 220px;
-          color: rgba(200,240,96,.025);
+          color: rgba(var(--accent-rgb),.025);
           letter-spacing: -.02em;
           line-height: 1;
           user-select: none;
@@ -599,7 +604,7 @@ export default function Hero() {
           content: '';
           position: absolute;
           width: 24px; height: 24px;
-          border-color: #c8f060;
+          border-color: var(--accent);
           border-style: solid;
           z-index: 2;
         }
@@ -629,9 +634,9 @@ export default function Hero() {
           position: absolute;
           width: 5px; height: 5px;
           border-radius: 50%;
-          background: #c8f060;
+          background: var(--accent);
           left: -2px;
-          box-shadow: 0 0 4px #c8f060;
+          box-shadow: 0 0 4px var(--accent);
           animation: heroTrack 3s ease-in-out infinite;
         }
 
@@ -656,7 +661,7 @@ export default function Hero() {
 
         .hero-badge-top {
           top: -14px; right: -28px;
-          border-color: rgba(200,240,96,.2);
+          border-color: rgba(var(--accent-rgb),.2);
           animation: heroBadgeUp 3.5s ease-in-out infinite;
         }
 
@@ -672,7 +677,7 @@ export default function Hero() {
           display: block;
           text-transform: uppercase;
           letter-spacing: .1em;
-          color: #c8f060;
+          color: var(--accent);
           margin-bottom: 2px;
           font-size: 10px;
         }
@@ -720,7 +725,7 @@ export default function Hero() {
         .hero-marquee-dot {
           width: 5px; height: 5px;
           border-radius: 50%;
-          background: #c8f060;
+          background: var(--accent);
           flex-shrink: 0;
         }
 
@@ -1576,7 +1581,7 @@ export default function Hero() {
             <span className="hero-badge-label" style={{ color: "#4a4a44" }}>
               Status
             </span>
-            <span className="hero-badge-val" style={{ color: "#c8f060" }}>
+            <span className="hero-badge-val" style={{ color: "var(--accent)" }}>
               ● Open to Remote
             </span>
           </div>

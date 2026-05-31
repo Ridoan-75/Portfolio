@@ -4,29 +4,32 @@ import Hero from "@/components/Hero";
 import Skills from "@/components/Skills";
 import Journey from "@/components/Education";
 import Projects from "@/components/Projects";
-
+import PracticalBackground from "../components/ParticleBackground"
 import Footer from "@/components/Footer";
-import CustomCursor from "@/components/CustomCursor";
+import Cursor from "@/components/Cursor";
 import Contact from "@/components/Contact";
 import ScrollToTop from "@/components/ScrollToTop";
 import Loading from "@/components/Loading";
+import SiteCustomizer from "@/components/SiteCustomizer";
 
 export default function Home() {
   return (
     <>
-    <Loading/>
-      <CustomCursor />
+      <Loading />
+      <PracticalBackground />
+      <Cursor />
+      <SiteCustomizer />
       <SmoothScroll>
         <Navbar />
-        <main>
+        <main style={{ position: "relative", zIndex: 1 }}>
           <Hero />
           <Skills />
           <Journey />
           <Projects />
-          <Contact/>
+          <Contact />
         </main>
         <Footer />
-        <ScrollToTop/>
+        <ScrollToTop />
       </SmoothScroll>
     </>
   );

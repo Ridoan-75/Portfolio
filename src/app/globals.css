@@ -1,16 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #0a0f1e;
-  --bg-secondary: #0d1428;
-  --bg-card: #111827;
-  --accent-blue: #3b82f6;
-  --accent-cyan: #06b6d4;
-  --accent-green: #10b981;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --border-color: rgba(59, 130, 246, 0.15);
-  --gradient-hero: linear-gradient(135deg, #3b82f6, #06b6d4);
+  --accent: #c8f060;
+  --accent-rgb: 200,240,96;
+  --accent-glow: rgba(200,240,96,0.25);
+  --site-font: 'DM Sans', sans-serif;
 }
 
 * {
@@ -24,15 +18,15 @@ html {
 }
 
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Syne', sans-serif;
+  background-color: #080808;
+  color: #f0ece4;
+  font-family: var(--site-font);
   overflow-x: hidden;
 }
 
 ::selection {
-  background: var(--accent-blue);
-  color: white;
+  background: var(--accent);
+  color: #080808;
 }
 
 ::-webkit-scrollbar {
@@ -40,10 +34,114 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: #080808;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--accent-blue);
+  background: var(--accent);
   border-radius: 2px;
+}
+
+/* ── Section transparency — canvas shows through ── */
+#home, #skills, #education, #projects, #contact {
+  background: transparent !important;
+}
+
+/* ── Status dots ── */
+.hero-status-dot,
+.sk-status-dot,
+.edu-status-dot,
+.proj-status-dot,
+.ct-status-dot {
+  background: var(--accent) !important;
+  box-shadow: 0 0 6px var(--accent) !important;
+}
+
+/* ── Status texts ── */
+.hero-status-text,
+.sk-status-text,
+.edu-status-text,
+.proj-status-text,
+.ct-status-text {
+  color: var(--accent) !important;
+}
+
+/* ── Heading accents ── */
+.hero-heading .h-accent,
+.sk-heading .h-accent,
+.edu-heading .h-accent,
+.proj-heading .h-accent,
+.ct-heading .h-accent {
+  color: var(--accent) !important;
+}
+
+/* ── Role lines ── */
+.hero-role-line::before,
+.sk-role-line::before,
+.edu-role-line::before,
+.proj-role-line::before,
+.ct-role-line::before {
+  background: var(--accent) !important;
+}
+
+/* ── Stat numbers ── */
+.hero-stat-num,
+.sk-stat-num,
+.edu-stat-num,
+.proj-stat-num,
+.ct-stat-num {
+  color: var(--accent) !important;
+}
+
+/* ── Primary buttons ── */
+.hero-btn-primary,
+.ct-send-btn {
+  background: var(--accent) !important;
+}
+
+/* ── Card dots ── */
+.sk-card-dot,
+.edu-dot {
+  background: var(--accent) !important;
+  box-shadow: 0 0 10px var(--accent) !important;
+}
+
+/* ── Marquee dot ── */
+.hero-marquee-dot {
+  background: var(--accent) !important;
+}
+
+/* ── Progress bar fills ── */
+.sk-bar-fill {
+  background: var(--accent) !important;
+}
+
+/* ── Education timeline ── */
+.edu-timeline-line {
+  background: linear-gradient(
+    to bottom,
+    var(--accent) 0%,
+    #60a5fa 50%,
+    #f472b6 100%
+  ) !important;
+}
+
+/* ── Scroll to top button position ── */
+.stt-btn {
+  bottom: 32px !important;
+  right: 32px !important;
+}
+
+@media (max-width: 768px) {
+  .stt-btn {
+    bottom: 24px !important;
+    right: 24px !important;
+  }
+}
+
+@media (max-width: 599px) {
+  .stt-btn {
+    bottom: 20px !important;
+    right: 20px !important;
+  }
 }

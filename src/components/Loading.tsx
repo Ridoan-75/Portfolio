@@ -22,8 +22,19 @@ export default function PageLoader() {
   const [phase, setPhase] = useState<"loading" | "complete" | "reveal">(
     "loading",
   );
+  const [accent, setAccent] = useState("#c8f060");
   const containerRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("site-settings");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.accent) setAccent(parsed.accent);
+      }
+    } catch {}
+  }, []);
 
   // GSAP entrance animations
   useEffect(() => {
@@ -172,9 +183,9 @@ export default function PageLoader() {
               position: absolute;
               width: 5px; height: 5px;
               border-radius: 50%;
-              background: #c8f060;
+              background: var(--accent);
               left: -2px;
-              box-shadow: 0 0 6px #c8f060;
+              box-shadow: 0 0 6px var(--accent);
               animation: loaderTrack 3.5s ease-in-out infinite;
             }
 
@@ -192,8 +203,8 @@ export default function PageLoader() {
               display: inline-flex;
               align-items: center;
               gap: 8px;
-              background: rgba(200,240,96,.06);
-              border: 1px solid rgba(200,240,96,.18);
+              background: rgba(var(--accent-rgb),.06);
+              border: 1px solid rgba(var(--accent-rgb),.18);
               border-radius: 3px;
               padding: 6px 14px;
               margin-bottom: 32px;
@@ -203,8 +214,8 @@ export default function PageLoader() {
             .loader-status-dot {
               width: 7px; height: 7px;
               border-radius: 50%;
-              background: #c8f060;
-              box-shadow: 0 0 6px #c8f060;
+              background: var(--accent);
+              box-shadow: 0 0 6px var(--accent);
               animation: loaderBlink 2s ease infinite;
               flex-shrink: 0;
             }
@@ -216,7 +227,7 @@ export default function PageLoader() {
               font-size: 11px;
               letter-spacing: .12em;
               text-transform: uppercase;
-              color: #c8f060;
+              color: var(--accent);
             }
 
             .loader-marquee-wrap {
@@ -256,7 +267,7 @@ export default function PageLoader() {
             .loader-marquee-dot {
               width: 4px; height: 4px;
               border-radius: 50%;
-              background: #c8f060;
+              background: var(--accent);
               opacity: .4;
               flex-shrink: 0;
             }
@@ -366,7 +377,7 @@ export default function PageLoader() {
                   style={{
                     fontFamily: "'Bebas Neue', sans-serif",
                     fontSize: "clamp(64px, 12vw, 130px)",
-                    color: i === 0 ? "#c8f060" : "#f0ece4",
+                    color: i === 0 ? accent : "#f0ece4",
                     letterSpacing: "0.04em",
                     lineHeight: 0.92,
                     display: "inline-block",
@@ -397,7 +408,7 @@ export default function PageLoader() {
               style={{
                 width: 28,
                 height: 1,
-                background: "#c8f060",
+                background: accent,
                 transformOrigin: "left",
               }}
             />
@@ -445,7 +456,7 @@ export default function PageLoader() {
                   inset: 0,
                   transformOrigin: "left",
                   background:
-                    "linear-gradient(to right, #c8f060, #a3e635)",
+                    `linear-gradient(to right, ${accent}, ${accent}aa)`,
                   scaleX: progress / 100,
                 }}
                 transition={{ ease: "linear", duration: 0.05 }}
@@ -481,7 +492,7 @@ export default function PageLoader() {
                 animate={{
                   color:
                     phase === "complete" || phase === "reveal"
-                      ? "#c8f060"
+                      ? accent
                       : "#3a3a36",
                 }}
                 transition={{ duration: 0.4 }}
@@ -505,7 +516,7 @@ export default function PageLoader() {
                     style={{
                       fontFamily: "'JetBrains Mono', monospace",
                       fontSize: 10,
-                      color: "#c8f060",
+                      color: accent,
                       letterSpacing: "0.12em",
                       textTransform: "uppercase",
                     }}
