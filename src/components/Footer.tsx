@@ -7,11 +7,13 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const quickLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Skills", href: "#skills" },
-  { label: "Education", href: "#education" },
-  { label: "Projects", href: "#projects" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "/" },
+  { label: "Skills", href: "/skills" },
+  { label: "Education", href: "/education" },
+  { label: "Projects", href: "/projects" },
+  { label: "Blog", href: "/blog" },
+  { label: "Reviews", href: "/reviews" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const socialLinks = [

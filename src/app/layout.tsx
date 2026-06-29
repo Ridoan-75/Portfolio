@@ -41,7 +41,7 @@ export default function RootLayout({
       lang="en"
       className={`${syne.variable} ${spaceGrotesk.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
     >
-      <body style={{ position: "relative" }}>
+      <body>
         {children}
       </body>
     </html>
