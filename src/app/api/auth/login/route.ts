@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 import { signToken } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    }
+
     const { email, password } = await req.json();
 
     const user = await prisma.user.findUnique({

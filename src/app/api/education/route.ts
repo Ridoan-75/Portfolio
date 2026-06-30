@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
 export async function GET() {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json([], { status: 200 });
+    }
+
     const items = await prisma.education.findMany({
       orderBy: [{ order: "asc" }, { createdAt: "asc" }],
     });
@@ -16,6 +20,10 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    }
+
     const token = req.cookies.get("admin_token")?.value;
     const payload = token ? verifyToken(token) : null;
     if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

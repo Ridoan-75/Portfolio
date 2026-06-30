@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
 // GET - public (published only) | admin (all)
 export async function GET(req: NextRequest) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json([], { status: 200 });
+    }
+
     const token = req.cookies.get("admin_token")?.value;
     const isAdmin = token ? !!verifyToken(token) : false;
 
@@ -21,6 +25,10 @@ export async function GET(req: NextRequest) {
 // POST - admin only
 export async function POST(req: NextRequest) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    }
+
     const token = req.cookies.get("admin_token")?.value;
     const payload = token ? verifyToken(token) : null;
 

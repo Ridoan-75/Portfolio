@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
 export async function GET(
@@ -7,6 +7,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
     const { id } = await params;
     const token = req.cookies.get("admin_token")?.value;
     const isAdmin = token ? !!verifyToken(token) : false;

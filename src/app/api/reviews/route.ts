@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 
 // GET - public
 export async function GET() {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json([], { status: 200 });
+    }
+
     const reviews = await prisma.review.findMany({
       orderBy: { createdAt: "desc" },
       include: { reply: true },
@@ -17,6 +21,10 @@ export async function GET() {
 // POST - public (anyone can review)
 export async function POST(req: NextRequest) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    }
+
     const { name, message } = await req.json();
 
     if (!name || !message) {
