@@ -2,18 +2,16 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+const globalForPrisma = globalThis as typeof globalThis & {
+  prisma?: PrismaClient;
 };
 
 function createPrismaClient() {
-  const connectionString = process.env.DATABASE_URL;
-  
-  if (!connectionString) {
-    console.warn("DATABASE_URL not set, using in-memory adapter");
-    return new PrismaClient({
-      log: ["error"],
-    });
+  const connectionString =
+    process.env.DATABASE_URL ?? "postgresql://postgres:postgres@127.0.0.1:5432/postgres";
+
+  if (!process.env.DATABASE_URL) {
+    console.warn("DATABASE_URL not set, falling back to local Postgres connection string");
   }
 
   const pool = new Pool({ connectionString });
