@@ -7,20 +7,25 @@ const globalForPrisma = globalThis as typeof globalThis & {
 };
 
 function createPrismaClient() {
-  const connectionString =
-    process.env.DATABASE_URL ?? "postgresql://postgres:postgres@127.0.0.1:5432/postgres";
+  const connectionString = process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? process.env.DATABASE_URL_UNPOOLED;
 
-  if (!process.env.DATABASE_URL) {
-    console.warn("DATABASE_URL not set, falling back to local Postgres connection string");
+  if (!connectionString) {
+    console.warn("No database connection string configured; Prisma client will be unavailable at runtime.");
+    return new PrismaClient({ log: ["error"] });
   }
 
-  const pool = new Pool({ connectionString });
-  const adapter = new PrismaPg(pool);
+  try {
+    const pool = new Pool({ connectionString });
+    const adapter = new PrismaPg(pool);
 
-  return new PrismaClient({
-    adapter,
-    log: ["error"],
-  });
+    return new PrismaClient({
+      adapter,
+      log: ["error"],
+    });
+  } catch (error) {
+    console.error("Failed to initialize Prisma adapter:", error);
+    return new PrismaClient({ log: ["error"] });
+  }
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
