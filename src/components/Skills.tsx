@@ -146,7 +146,13 @@ export default function Skills() {
     return map;
   }, [skills]);
 
-  const categoryNames = useMemo(() => Object.keys(skillsByCategory).sort(), [skillsByCategory]);
+  const categoryNames = useMemo(() =>
+    Object.keys(skillsByCategory).sort((a, b) => {
+      const aTime = new Date(skillsByCategory[a][0].createdAt).getTime();
+      const bTime = new Date(skillsByCategory[b][0].createdAt).getTime();
+      return aTime - bTime;
+    }),
+  [skillsByCategory]);
 
   return (
     <>
