@@ -26,6 +26,7 @@ model Blog {
   title     String
   content   String
   thumbnail String?
+  images    String[] @default([])
   tags      String[]
   category  String?
   published Boolean  @default(false)
@@ -68,8 +69,48 @@ model Project {
   description String
   thumbnail   String?
   tags        String[]
+  category    String?
   liveUrl     String?
   githubUrl   String?
   featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Certificate {
+  id            String   @id @default(cuid())
+  title         String
+  issuer        String
+  issueDate     String
+  expiryDate    String?
+  credentialId  String?
+  credentialUrl String?
+  image         String?
+  category      String?
+  createdAt     DateTime @default(now())
+}
+
+model Experience {
+  id          String   @id @default(cuid())
+  role        String
+  company     String
+  period      String
+  type        String
+  color       String   @default("#6366f1")
+  description String
+  highlights  String[]
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Education {
+  id          String   @id @default(cuid())
+  degree      String
+  institution String
+  period      String
+  badge       String
+  color       String   @default("#6366f1")
+  description String
+  subjects    String[]
+  order       Int      @default(0)
   createdAt   DateTime @default(now())
 }

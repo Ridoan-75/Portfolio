@@ -28,13 +28,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { title, content, thumbnail, tags, category, published } = await req.json();
+    const { title, content, thumbnail, images, tags, category, published } = await req.json();
 
     const blog = await prisma.blog.create({
       data: {
         title,
         content,
-        thumbnail,
+        thumbnail: thumbnail || null,
+        images: images || [],
         tags: tags || [],
         category: category || null,
         published: published || false,

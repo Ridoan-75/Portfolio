@@ -76,11 +76,11 @@ export default function Sidebar() {
         }}>
           <span style={{
             width: "5px", height: "5px", borderRadius: "50%",
-            background: "#22c55e", display: "inline-block",
+            background: "#3b82f6", display: "inline-block",
             animation: "pulse 2s infinite",
           }} />
           <span style={{
-            fontSize: "8px", color: "#22c55e",
+            fontSize: "8px", color: "#3b82f6",
             letterSpacing: "0.08em",
             fontFamily: "'JetBrains Mono', monospace",
           }}>

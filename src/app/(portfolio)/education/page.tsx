@@ -1,5 +1,5 @@
-import Journey from "@/components/Education";
+import { redirect } from "next/navigation";
 
 export default function EducationPage() {
-  return <Journey />;
+  redirect("/about");
 }

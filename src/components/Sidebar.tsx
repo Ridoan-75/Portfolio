@@ -8,27 +8,22 @@ import {
   FolderOpen,
   Cpu,
   BookOpen,
-  GraduationCap,
+  User,
   Mail,
-  MessageSquare,
-  Settings,
   Search,
 } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/", icon: Home },
+  { label: "About", href: "/about", icon: User },
   { label: "Skills", href: "/skills", icon: Cpu },
-  { label: "Education", href: "/education", icon: GraduationCap },
   { label: "Projects", href: "/projects", icon: FolderOpen },
   { label: "Blog", href: "/blog", icon: BookOpen },
-  { label: "Reviews", href: "/reviews", icon: MessageSquare },
   { label: "Contact", href: "/contact", icon: Mail },
-  { label: "Settings", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const hireBtnRef = useRef<HTMLAnchorElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const [lightbox, setLightbox] = useState(false);
@@ -53,8 +48,8 @@ export default function Sidebar() {
     const accent =
       getComputedStyle(document.documentElement)
         .getPropertyValue("--accent")
-        .trim() || "#c8f060";
-    const colors = [accent, "#a3e635", "#ffffff", "#6a6a62"];
+        .trim() || "#3b82f6";
+    const colors = [accent, "#93c5fd", "#ffffff", "#6a6a72"];
     for (let i = 0; i < 12; i++) {
       const dot = document.createElement("span");
       Object.assign(dot.style, {
@@ -97,25 +92,6 @@ export default function Sidebar() {
     [router]
   );
 
-  const handleHireClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>) => {
-      e.preventDefault();
-      const btn = hireBtnRef.current!;
-      const rect = btn.getBoundingClientRect();
-      firework(rect.left + rect.width / 2, rect.top + rect.height / 2);
-      gsap
-        .timeline()
-        .to(btn, { scale: 1.15, duration: 0.1 })
-        .to(btn, { scale: 0.9, duration: 0.1 })
-        .to(btn, { scale: 1, duration: 0.15 })
-        .to(btn, { x: -4, repeat: 4, yoyo: true, duration: 0.05 })
-        .set(btn, { x: 0 });
-      setTimeout(() => {
-        router.push("/contact");
-      }, 550);
-    },
-    [router]
-  );
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -125,13 +101,19 @@ export default function Sidebar() {
   return (
     <>
       <style>{`
+        .sidebar-desktop::before {
+          content: '';
+          position: absolute; top: 0; left: 0; right: 0; height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),.55), transparent);
+          z-index: 2; pointer-events: none;
+        }
         .sidebar-link-item {
           font-family: var(--site-font, 'JetBrains Mono', monospace);
           font-size: 13px;
           letter-spacing: 0.07em;
           text-transform: uppercase;
           text-decoration: none;
-          color: #8a8a7a;
+          color: #b8b4ac;
           display: flex;
           align-items: center;
           gap: 12px;
@@ -150,43 +132,47 @@ export default function Sidebar() {
           transform: scaleY(0);
           transition: transform 0.2s ease;
           border-radius: 0 2px 2px 0;
+          box-shadow: 2px 0 10px rgba(var(--accent-rgb),.3);
         }
         .sidebar-link-item:hover {
-          color: #d8d4cc;
-          background: rgba(255,255,255,0.05);
+          color: #eae6de;
+          background: rgba(255,255,255,0.07);
         }
         .sidebar-link-item:hover::before { transform: scaleY(1); }
         .sidebar-link-item.active-link {
           color: var(--accent);
-          background: rgba(255,255,255,0.05);
+          background: rgba(var(--accent-rgb),0.08);
         }
-        .sidebar-link-item.active-link::before { transform: scaleY(1); }
+        .sidebar-link-item.active-link::before {
+          transform: scaleY(1);
+          box-shadow: 2px 0 14px rgba(var(--accent-rgb),.45);
+        }
 
-        .hire-btn-side {
-          font-family: var(--site-font, 'JetBrains Mono', monospace);
-          font-size: 11px;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: #080808;
-          background: var(--accent);
-          text-decoration: none;
-          padding: 10px 16px;
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-          transition: filter 0.2s ease;
-          width: 100%;
+/* spinning ring */
+        .sb-avatar-wrap {
+          position: relative; flex-shrink: 0;
+          width: 58px; height: 58px;
         }
-        .hire-btn-side:hover { filter: brightness(1.1); }
-
-        .sidebar-footer-text {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 10px;
-          color: #4a4a44;
-          letter-spacing: 0.08em;
+        .sb-avatar-ring {
+          position: absolute; inset: -2px;
+          border-radius: 14px;
+          background: conic-gradient(from 180deg, var(--accent) 0%, rgba(var(--accent-rgb),0.12) 55%, var(--accent) 100%);
+          animation: sb-ring-spin 6s linear infinite;
         }
+        @keyframes sb-ring-spin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        .sb-avatar-btn {
+          position: relative; z-index: 1;
+          width: 58px; height: 58px; border-radius: 12px;
+          border: 2px solid rgba(6,7,15,1);
+          padding: 0; cursor: pointer; overflow: hidden;
+          background: #1a1a18; display: block;
+          transition: box-shadow 0.2s;
+        }
+        .sb-avatar-btn:hover { box-shadow: 0 0 12px rgba(var(--accent-rgb),0.3); }
+        .sb-avatar-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         @media (max-width: 1024px) {
           .sidebar-desktop { display: none !important; }
@@ -198,18 +184,20 @@ export default function Sidebar() {
         className="sidebar-desktop"
         style={{
           position: "sticky",
-          top: "32px",
+          top: "0",
           width: "280px",
           minWidth: "280px",
           alignSelf: "start",
-          height: "calc(100vh - 64px)",
-          background: "#080808",
-          border: "1px solid #151515",
-          borderRadius: "28px",
+          height: "100vh",
+          background: "rgba(6,7,15,0.97)",
+          backdropFilter: "blur(28px)",
+          WebkitBackdropFilter: "blur(28px)",
+          borderRight: "1px solid rgba(var(--accent-rgb),0.15)",
+          borderRadius: "0",
           display: "flex",
           flexDirection: "column",
-          padding: "26px 20px",
-          boxShadow: "0 36px 80px rgba(0,0,0,0.32)",
+          padding: "28px 20px",
+          boxShadow: "8px 0 40px rgba(0,0,0,0.55), inset -1px 0 0 rgba(255,255,255,0.04)",
           fontFamily: "var(--site-font, 'DM Sans', sans-serif)",
           overflow: "hidden",
         }}
@@ -220,32 +208,13 @@ export default function Sidebar() {
           {/* Image + name row */}
           <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "12px" }}>
 
-            {/* Profile image — box shape */}
-            <button
-              onClick={() => setLightbox(true)}
-              style={{
-                width: "58px", height: "58px", borderRadius: "12px",
-                border: "2px solid rgba(var(--accent-rgb),0.4)",
-                padding: 0, cursor: "pointer", flexShrink: 0,
-                overflow: "hidden", background: "#1a1a18",
-                transition: "border-color 0.2s, box-shadow 0.2s",
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(var(--accent-rgb),0.85)";
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 14px rgba(var(--accent-rgb),0.3)";
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(var(--accent-rgb),0.4)";
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
-              }}
-              title="View photo"
-            >
-              <img
-                src="/image.jpg"
-                alt="Md Ridoan"
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-              />
-            </button>
+            {/* Profile image — square with spinning ring */}
+            <div className="sb-avatar-wrap">
+              <div className="sb-avatar-ring" />
+              <button className="sb-avatar-btn" onClick={() => setLightbox(true)} title="View photo">
+                <img src="/image.jpg" alt="Md Ridoan" />
+              </button>
+            </div>
 
             {/* Name + verified + role */}
             <div style={{ minWidth: 0 }}>
@@ -264,7 +233,7 @@ export default function Sidebar() {
               </div>
               <div style={{
                 fontFamily: "'JetBrains Mono', monospace",
-                fontSize: "10px", color: "#a0a098", letterSpacing: "0.04em",
+                fontSize: "10px", color: "#c4c0b8", letterSpacing: "0.04em",
                 whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                 marginBottom: "2px",
               }}>
@@ -272,7 +241,7 @@ export default function Sidebar() {
               </div>
               <div style={{
                 fontFamily: "'JetBrains Mono', monospace",
-                fontSize: "10px", color: "#8a8a80", letterSpacing: "0.05em",
+                fontSize: "10px", color: "#a8a4a0", letterSpacing: "0.05em",
               }}>
                 Full Stack Dev
               </div>
@@ -282,18 +251,18 @@ export default function Sidebar() {
           {/* Open to work badge */}
           <div style={{
             display: "inline-flex", alignItems: "center", gap: "8px",
-            background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.45)",
+            background: "rgba(var(--accent-rgb),0.1)", border: "1px solid rgba(var(--accent-rgb),0.3)",
             borderRadius: "20px", padding: "7px 16px",
-            boxShadow: "0 0 12px rgba(34,197,94,0.08)",
+            boxShadow: "0 0 12px rgba(var(--accent-rgb),0.08)",
           }}>
             <span style={{
               width: "8px", height: "8px", borderRadius: "50%",
-              background: "#22c55e", display: "inline-block",
-              boxShadow: "0 0 8px #22c55e, 0 0 16px rgba(34,197,94,0.4)",
+              background: "var(--accent)", display: "inline-block",
+              boxShadow: "0 0 8px var(--accent)",
               animation: "pulse 2s infinite", flexShrink: 0,
             }} />
             <span style={{
-              fontSize: "11px", color: "#4ade80",
+              fontSize: "11px", color: "var(--accent)",
               letterSpacing: "0.07em", fontFamily: "'JetBrains Mono', monospace",
               fontWeight: 500,
             }}>
@@ -311,20 +280,20 @@ export default function Sidebar() {
             background: "#111110", border: "1px solid #2a2a28",
             borderRadius: "8px", cursor: "pointer",
             fontFamily: "'JetBrains Mono', monospace",
-            fontSize: "12px", color: "#7a7a70",
+            fontSize: "12px", color: "#9a9a90",
             letterSpacing: "0.06em", textAlign: "left",
             transition: "border-color 0.2s, color 0.2s, background 0.2s",
           }}
           onMouseEnter={(e) => {
             const b = e.currentTarget as HTMLButtonElement;
             b.style.borderColor = "rgba(var(--accent-rgb),0.35)";
-            b.style.color = "#b0b0a8";
+            b.style.color = "#d0d0c8";
             b.style.background = "#161614";
           }}
           onMouseLeave={(e) => {
             const b = e.currentTarget as HTMLButtonElement;
             b.style.borderColor = "#2a2a28";
-            b.style.color = "#7a7a70";
+            b.style.color = "#9a9a90";
             b.style.background = "#111110";
           }}
         >
@@ -333,7 +302,7 @@ export default function Sidebar() {
           <span style={{
             background: "#1a1a18", border: "1px solid #333330",
             borderRadius: "4px", padding: "2px 7px", fontSize: "10px",
-            letterSpacing: "0.04em", color: "#6a6a60",
+            letterSpacing: "0.04em", color: "#8a8a78",
           }}>
             Ctrl K
           </span>
@@ -362,20 +331,6 @@ export default function Sidebar() {
 
         </nav>
 
-        {/* Hire Me Button */}
-        <div style={{ marginTop: "16px", marginBottom: "16px" }}>
-          <a
-            ref={hireBtnRef}
-            href="/contact"
-            onClick={handleHireClick}
-            className="hire-btn-side"
-          >
-            Hire Me →
-          </a>
-        </div>
-
-        {/* Footer */}
-        <div className="sidebar-footer-text">ridoan@dev</div>
       </div>
 
       {/* Lightbox — outside sidebar so it centers on full viewport */}

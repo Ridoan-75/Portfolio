@@ -21,7 +21,7 @@ interface Settings {
   accent: string; bg: BgType; cursor: CursorType;
   sound: boolean; clickSound: ClickSoundType; hoverSound: HoverSoundType;
 }
-const DEFAULTS: Settings = { accent:"#c8f060", bg:"particles", cursor:"crosshair", sound:true, clickSound:"glitch", hoverSound:"tick" };
+const DEFAULTS: Settings = { accent:"#3b82f6", bg:"particles", cursor:"crosshair", sound:true, clickSound:"glitch", hoverSound:"tick" };
 
 const ACCENTS = [
   { color:"#c8f060", name:"Lime"    }, { color:"#a3e635", name:"Green"   },

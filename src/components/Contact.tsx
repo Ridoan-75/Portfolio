@@ -57,7 +57,7 @@ function SuccessOverlay({ onReset }: { onReset: () => void }) {
       { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: "back.out(1.7)", delay: 0.1 }
     );
     // confetti
-    const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#c8f060";
+    const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#3b82f6";
     const colors = [accent, "#ffffff", "#6a6a62", "#f0ece4"];
     for (let i = 0; i < 28; i++) {
       const dot = document.createElement("span");
@@ -326,21 +326,11 @@ export default function Contact() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-        /* ── exact hero padding ── */
         #contact {
-          padding: 80px 60px 80px;
           min-height: 100vh;
-          display: flex; flex-direction: column; justify-content: center;
-          background: #080808; color: #e8e4dc;
-          position: relative; overflow: hidden;
+          display: flex; flex-direction: column;
+          color: #e8e4dc;
           font-family: 'DM Sans', sans-serif;
-        }
-        #contact::before {
-          content: ''; position: absolute; inset: 0;
-          background-image:
-            linear-gradient(rgba(var(--accent-rgb),.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(var(--accent-rgb),.04) 1px, transparent 1px);
-          background-size: 44px 44px; pointer-events: none; z-index: 0;
         }
 
         .ct-corner-tl { position: absolute; top: 0; left: 0; width: 180px; height: 180px; border-right: 1px solid rgba(var(--accent-rgb),.08); border-bottom: 1px solid rgba(var(--accent-rgb),.08); pointer-events: none; }
@@ -390,7 +380,7 @@ export default function Contact() {
         /* ── role line ── */
         .ct-role-line {
           font-family: 'JetBrains Mono', monospace; font-size: 14px;
-          letter-spacing: .08em; text-transform: uppercase; color: #6a6a60;
+          letter-spacing: .08em; text-transform: uppercase; color: #e8e4dc;
           margin-bottom: 18px;
           display: flex; align-items: center; gap: 12px; flex-wrap: wrap; opacity: 0;
         }
@@ -398,7 +388,7 @@ export default function Contact() {
 
         /* ── desc ── */
         .ct-desc {
-          font-size: 16px; line-height: 1.85; color: #4a4a44;
+          font-size: 16px; line-height: 1.85; color: #e8e4dc;
           max-width: 440px; margin-bottom: 52px; opacity: 0;
         }
 
@@ -407,7 +397,7 @@ export default function Contact() {
           display: grid;
           grid-template-columns: 1fr 1.4fr;
           gap: 64px;
-          align-items: start;
+          align-items: stretch;
         }
 
         /* ── info card ── */
@@ -489,6 +479,7 @@ export default function Contact() {
           -webkit-backdrop-filter: blur(14px) saturate(1.4);
           border-radius: 6px; padding: 36px 32px;
           position: relative; overflow: hidden; opacity: 0;
+          height: 100%; box-sizing: border-box;
         }
         .ct-form-corner-tl {
           position: absolute; top: -1px; left: -1px;
@@ -556,7 +547,6 @@ export default function Contact() {
 
         /* ── responsive — exact hero breakpoints ── */
         @media (max-width: 1199px) {
-          #contact { padding: 80px 40px 80px; }
           .ct-heading { font-size: clamp(52px, 8vw, 100px); }
           .ct-corner-tl, .ct-corner-br { width: 120px; height: 120px; }
           .ct-stat-item { padding: 14px 24px; }
@@ -564,7 +554,6 @@ export default function Contact() {
           .ct-grid { gap: 48px; }
         }
         @media (max-width: 1023px) {
-          #contact { padding: 70px 32px 90px; }
           .ct-heading { font-size: clamp(48px, 8vw, 80px); }
           .ct-grid { grid-template-columns: 1fr; gap: 40px; }
           .ct-desc { max-width: 100%; }
@@ -572,7 +561,6 @@ export default function Contact() {
           .ct-scanline { left: 32px; right: 32px; }
         }
         @media (max-width: 767px) {
-          #contact { padding: 60px 24px 90px; padding-top: 80px; }
           .ct-heading { font-size: clamp(52px, 14vw, 80px); }
           .ct-desc { font-size: 14px; }
           .ct-stats { width: 100%; }
@@ -582,7 +570,6 @@ export default function Contact() {
           .ct-form-card { padding: 24px 20px; }
         }
         @media (max-width: 599px) {
-          #contact { padding: 50px 18px 80px; padding-top: 70px; }
           .ct-heading { font-size: clamp(44px, 16vw, 64px); }
           .ct-role-line { font-size: 10px; gap: 8px; letter-spacing: .06em; }
           .ct-role-line::before { width: 20px; }
@@ -593,7 +580,6 @@ export default function Contact() {
           .ct-grid { gap: 32px; }
         }
         @media (max-width: 379px) {
-          #contact { padding: 40px 14px 70px; padding-top: 60px; }
           .ct-heading { font-size: clamp(38px, 18vw, 52px); }
           .ct-corner-tl, .ct-corner-br { width: 40px; height: 40px; }
           .ct-scanline { left: 14px; right: 14px; }
@@ -609,6 +595,7 @@ export default function Contact() {
       `}</style>
 
       <section id="contact" ref={sectionRef}>
+        <div className="page-card">
         <div className="ct-corner-tl" />
         <div className="ct-corner-br" />
         <div className="ct-scanline" />
@@ -645,7 +632,7 @@ export default function Contact() {
           <div className="ct-grid">
 
             {/* ── LEFT ── */}
-            <div ref={leftRef} style={{ opacity: 0 }}>
+            <div ref={leftRef} style={{ opacity: 0, display: "flex", flexDirection: "column" }}>
               {/* info cards */}
               <div style={{ marginBottom: "0" }}>
                 {contactInfo.map((info, i) => (
@@ -667,7 +654,7 @@ export default function Contact() {
               </div>
 
               {/* terminal */}
-              <div className="ct-terminal">
+              <div className="ct-terminal" style={{ flex: 1 }}>
                 <div className="ct-terminal-bar">
                   {["#ff5f57", "#febc2e", "#28c840"].map((c) => (
                     <span key={c} className="ct-terminal-dot" style={{ background: c }} />
@@ -777,7 +764,7 @@ export default function Contact() {
               <div className="ct-stat-label">Timezone</div>
             </div>
             <div className="ct-stat-item">
-              <div className="ct-stat-num" style={{ color: "#f472b6" }}>100%</div>
+              <div className="ct-stat-num" style={{ color: "#93c5fd" }}>100%</div>
               <div className="ct-stat-label">Remote Ready</div>
             </div>
             <div className="ct-stat-item">
@@ -786,6 +773,7 @@ export default function Contact() {
             </div>
           </div>
 
+        </div>
         </div>
       </section>
     </>

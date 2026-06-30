@@ -7,105 +7,35 @@ import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// =============================================
-// 🔧 PROJECT DATA — notun project add korte
-// sudhu ei array te object add koro
-// =============================================
-const filters = ["All", "React", "Next.js", "Full Stack", "Landing Page", "Frontend"];
+const ITEMS_PER_PAGE = 6;
 
-const projects = [
-  {
-    title: "SaaS Dashboard",
-    category: "Full Stack",
-    description:
-      "A feature-rich analytics dashboard with real-time data visualization, user management, and role-based access control.",
-    tags: ["Next.js", "TypeScript", "Express", "Tailwind", "Prisma", "PostgreSQL"],
-    image: "/eco.png",
-    live: "https://ecospark-frontend-gules.vercel.app",
-    github: "https://github.com/Ridoan-75/ecospark-frontend",
-    year: "2026",
-    featured: true,
-  },
-  {
-    title: "Medical Store E-commerce",
-    category: "Full Stack",
-    description:
-      "Full-featured online store with Stripe payments, product filtering, cart system, and admin panel.",
-    tags: ["Next.js", "Stripe", "Prisma", "PostgreSQL", "Node.js", "Tailwind"],
-    image: "/medistore.png",
-    live: "https://medistore-client-lime.vercel.app/",
-    github: "https://github.com/Ridoan-75/medistore-client",
-    year: "2026",
-    featured: true,
-  },
-  {
-    title: "Nike Product Page",
-    category: "Frontend",
-    description:
-      "A visually stunning product page with interactive color selector and smooth GSAP animations.",
-    tags: ["React", "Tailwind", "Framer Motion", "Vercel"],
-    image: "/nike.png",
-    live: "https://nike-1-drab.vercel.app/",
-    github: "https://github.com/Ridoan-75/Nike",
-    year: "2025",
-    featured: false,
-  },
-  {
-    title: "Dashboard Design",
-    category: "Landing Page",
-    description:
-      "A clean and modern landing page for a SaaS product with smooth scroll animations.",
-    tags: ["React", "Tailwind", "Vercel"],
-    image: "/dashboard.png",
-    live: "https://dashboard-ashen-psi.vercel.app/",
-    github: "https://github.com/Ridoan-75/Dashboard",
-    year: "2025",
-    featured: false,
-  },
-  {
-    title: "Food Website",
-    category: "Frontend",
-    description:
-      "A modern restaurant website with menu filtering, reservation form, and scroll animations.",
-    tags: ["React", "Tailwind", "Vercel"],
-    image: "/foodie.png",
-    live: "https://foodie-website-d3s3.vercel.app/",
-    github: "https://github.com/Ridoan-75/Foodie-Website",
-    year: "2025",
-    featured: false,
-  },
-  {
-    title: "Finance Landing Page",
-    category: "React",
-    description:
-      "A sleek landing page for a finance app with interactive features and responsive design.",
-    tags: ["React", "Tailwind", "Vercel"],
-    image: "/finance.png",
-    live: "https://finance-website-cyan.vercel.app",
-    github: "https://github.com/Ridoan-75/Finance-Website",
-    year: "2024",
-    featured: false,
-  },
-];
+type Project = {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string | null;
+  tags: string[];
+  category: string | null;
+  liveUrl: string | null;
+  githubUrl: string | null;
+  featured: boolean;
+  createdAt: string;
+};
 
-// =============================================
-// 🃏 ProjectCard Component
-// =============================================
-function ProjectCard({
-  project,
-  index,
-}: {
-  project: (typeof projects)[0];
-  index: number;
-}) {
-  const cardRef = useRef<HTMLDivElement>(null);
+// ── Project Card ──────────────────────────────────────────────────────────────
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const cardRef      = useRef<HTMLDivElement>(null);
   const imageWrapRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
-  const accentRef = useRef<HTMLDivElement>(null);
+  const glowRef      = useRef<HTMLDivElement>(null);
+  const accentRef    = useRef<HTMLDivElement>(null);
+  const isTouchRef   = useRef(false);
   const [imageError, setImageError] = useState(false);
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered]       = useState(false);
 
-  // scroll entrance
+  useEffect(() => {
+    isTouchRef.current = window.matchMedia("(hover: none)").matches;
+  }, []);
+
   useEffect(() => {
     if (!cardRef.current) return;
     gsap.fromTo(cardRef.current,
@@ -116,40 +46,29 @@ function ProjectCard({
     );
   }, [index]);
 
-  // 3D tilt on mouse move
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const el = cardRef.current;
-    if (!el) return;
+    if (isTouchRef.current) return;
+    const el = cardRef.current; if (!el) return;
     const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-    gsap.to(el, {
-      rotateX: ((y - cy) / cy) * -5,
-      rotateY: ((x - cx) / cx) * 5,
-      duration: 0.3, ease: "power2.out",
-      transformPerspective: 900,
-    });
-    // glow follows cursor
-    if (glowRef.current) {
-      gsap.to(glowRef.current, {
-        x: x - 150, y: y - 150,
-        duration: 0.4, ease: "power2.out",
-      });
-    }
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const cx = rect.width / 2, cy = rect.height / 2;
+    gsap.to(el, { rotateX: ((y - cy) / cy) * -5, rotateY: ((x - cx) / cx) * 5,
+      duration: 0.3, ease: "power2.out", transformPerspective: 900 });
+    if (glowRef.current)
+      gsap.to(glowRef.current, { x: x - 150, y: y - 150, duration: 0.4, ease: "power2.out" });
   }, []);
 
   const handleMouseEnter = useCallback(() => {
     setHovered(true);
     gsap.to(cardRef.current, {
       borderColor: "rgba(var(--accent-rgb),0.35)",
-      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.15), 0 8px 40px rgba(0,0,0,0.38), 0 0 32px rgba(var(--accent-rgb),0.12)",
+      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14),inset 0 -1px 0 rgba(0,0,0,0.15),0 8px 40px rgba(0,0,0,0.38),0 0 32px rgba(var(--accent-rgb),0.12)",
       duration: 0.3,
     });
     gsap.to(accentRef.current, { opacity: 1, duration: 0.25 });
-    gsap.to(glowRef.current, { opacity: 1, duration: 0.3 });
-    gsap.to(imageWrapRef.current, { scale: 1.04, duration: 0.5, ease: "power2.out" });
+    gsap.to(glowRef.current,   { opacity: 1, duration: 0.3 });
+    if (!isTouchRef.current)
+      gsap.to(imageWrapRef.current, { scale: 1.04, duration: 0.5, ease: "power2.out" });
   }, []);
 
   const handleMouseLeave = useCallback(() => {
@@ -157,14 +76,16 @@ function ProjectCard({
     gsap.to(cardRef.current, {
       rotateX: 0, rotateY: 0,
       borderColor: "rgba(255,255,255,0.09)",
-      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.15), 0 4px 24px rgba(0,0,0,0.32), 0 1px 4px rgba(0,0,0,0.4)",
-      duration: 0.6, ease: "elastic.out(1,0.6)",
-      transformPerspective: 900,
+      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.15),0 4px 24px rgba(0,0,0,0.32),0 1px 4px rgba(0,0,0,0.4)",
+      duration: 0.6, ease: "elastic.out(1,0.6)", transformPerspective: 900,
     });
     gsap.to(accentRef.current, { opacity: 0, duration: 0.3 });
-    gsap.to(glowRef.current, { opacity: 0, duration: 0.3 });
-    gsap.to(imageWrapRef.current, { scale: 1, duration: 0.5, ease: "power2.out" });
+    gsap.to(glowRef.current,   { opacity: 0, duration: 0.3 });
+    if (!isTouchRef.current)
+      gsap.to(imageWrapRef.current, { scale: 1, duration: 0.5, ease: "power2.out" });
   }, []);
+
+  const year = new Date(project.createdAt).getFullYear().toString();
 
   return (
     <div style={{ perspective: "900px", opacity: 0 }} ref={cardRef}>
@@ -173,63 +94,48 @@ function ProjectCard({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         style={{
-          background: "linear-gradient(145deg, rgba(255,255,255,0.058) 0%, rgba(255,255,255,0.016) 100%)",
+          background: "linear-gradient(145deg,rgba(255,255,255,0.058) 0%,rgba(255,255,255,0.016) 100%)",
           border: "1px solid rgba(255,255,255,0.09)",
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.15), 0 4px 24px rgba(0,0,0,0.32), 0 1px 4px rgba(0,0,0,0.4)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.15),0 4px 24px rgba(0,0,0,0.32),0 1px 4px rgba(0,0,0,0.4)",
           backdropFilter: "blur(14px) saturate(1.4)",
           WebkitBackdropFilter: "blur(14px) saturate(1.4)",
-          borderRadius: "6px",
-          overflow: "hidden",
-          position: "relative",
-          willChange: "transform",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
+          borderRadius: "6px", overflow: "hidden", position: "relative",
+          willChange: "transform", height: "100%",
+          display: "flex", flexDirection: "column",
           transition: "border-color .3s ease, box-shadow .35s ease",
         }}
       >
         {/* top accent */}
         <div ref={accentRef} style={{
-          position: "absolute", top: 0, left: 0, right: 0,
-          height: "3px", background: "linear-gradient(90deg, var(--accent), transparent)",
+          position: "absolute", top: 0, left: 0, right: 0, height: "3px",
+          background: "linear-gradient(90deg,var(--accent),transparent)",
           boxShadow: "0 0 14px rgba(var(--accent-rgb),0.5)",
           opacity: 0, zIndex: 3,
         }} />
 
         {/* cursor glow */}
         <div ref={glowRef} style={{
-          position: "absolute", width: "360px", height: "360px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(var(--accent-rgb),0.12) 0%, transparent 68%)",
+          position: "absolute", width: "360px", height: "360px", borderRadius: "50%",
+          background: "radial-gradient(circle,rgba(var(--accent-rgb),0.12) 0%,transparent 68%)",
           pointerEvents: "none", opacity: 0, zIndex: 1,
           transform: "translate(-50%,-50%)",
         }} />
 
-        {/* ── image area ── */}
-        <div style={{
-          height: "200px", background: "#080808",
-          borderBottom: "1px solid #1a1a18",
-          position: "relative", overflow: "hidden",
-        }}>
-          {/* grid */}
+        {/* image */}
+        <div className="proj-img-wrap">
           <div style={{
             position: "absolute", inset: 0,
-            backgroundImage: "linear-gradient(rgba(var(--accent-rgb),.04) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--accent-rgb),.04) 1px, transparent 1px)",
+            backgroundImage: "linear-gradient(rgba(var(--accent-rgb),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--accent-rgb),.04) 1px,transparent 1px)",
             backgroundSize: "28px 28px", pointerEvents: "none", zIndex: 0,
           }} />
-
-          {/* image */}
           <div ref={imageWrapRef} style={{
-            position: "absolute", inset: "12px",
+            position: "absolute", inset: "10px",
             borderRadius: "3px", overflow: "hidden",
             border: "1px solid rgba(var(--accent-rgb),0.08)", zIndex: 1,
           }}>
-            {!imageError ? (
-              <Image
-                src={project.image}
-                alt={project.title}
-                fill
-                sizes="(max-width: 900px) 100vw, 350px"
+            {project.thumbnail && !imageError ? (
+              <Image src={project.thumbnail} alt={project.title} fill
+                sizes="(max-width:900px) 100vw, 350px"
                 style={{ objectFit: "cover" }}
                 onError={() => setImageError(true)}
               />
@@ -246,82 +152,59 @@ function ProjectCard({
                   <circle cx="8.5" cy="8.5" r="1.5"/>
                   <polyline points="21 15 16 10 5 21"/>
                 </svg>
-                <span style={{
-                  fontSize: "11px", fontFamily: "'JetBrains Mono', monospace",
-                  color: "rgba(var(--accent-rgb),0.25)", letterSpacing: "0.06em",
-                }}>{project.title}</span>
+                <span style={{ fontSize: "11px", fontFamily: "'JetBrains Mono',monospace",
+                  color: "rgba(var(--accent-rgb),0.25)", letterSpacing: "0.06em" }}>
+                  {project.title}
+                </span>
               </div>
             )}
           </div>
 
           {/* year badge */}
           <div style={{
-            position: "absolute", top: "10px", right: "10px", zIndex: 2,
-            padding: "4px 10px",
+            position: "absolute", top: "8px", right: "8px", zIndex: 2,
+            padding: "3px 9px",
             background: "rgba(8,8,8,0.85)", border: "1px solid rgba(var(--accent-rgb),0.2)",
             borderRadius: "3px", fontSize: "10px",
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: "'JetBrains Mono',monospace",
             color: "var(--accent)", letterSpacing: "0.08em",
-          }}>{project.year}</div>
+          }}>{year}</div>
 
-          {/* featured badge */}
+          {/* featured badge — solid, high contrast */}
           {project.featured && (
             <div style={{
-              position: "absolute", top: "10px", left: "10px", zIndex: 2,
+              position: "absolute", top: "8px", left: "8px", zIndex: 2,
               padding: "4px 10px",
-              background: "rgba(var(--accent-rgb),0.1)", border: "1px solid rgba(var(--accent-rgb),0.25)",
+              background: "var(--accent)",
               borderRadius: "3px", fontSize: "9px",
-              fontFamily: "'JetBrains Mono', monospace",
-              color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase",
-            }}>★ Featured</div>
+              fontFamily: "'JetBrains Mono',monospace",
+              color: "#000", letterSpacing: "0.12em", textTransform: "uppercase",
+              fontWeight: 700,
+              boxShadow: "0 2px 10px rgba(var(--accent-rgb),0.5)",
+            }}>★ FEATURED</div>
           )}
         </div>
 
-        {/* ── content ── */}
-        <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", flex: 1 }}>
-          {/* category */}
-          <div style={{
-            display: "inline-block", padding: "3px 10px", marginBottom: "10px",
-            background: "rgba(var(--accent-rgb),0.05)", border: "1px solid rgba(var(--accent-rgb),0.12)",
-            borderRadius: "2px", fontSize: "9px",
-            fontFamily: "'JetBrains Mono', monospace",
-            color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase",
-            width: "fit-content",
-          }}>{project.category}</div>
-
-          {/* title */}
-          <h3 style={{
-            fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: "20px", fontWeight: 400,
+        {/* content */}
+        <div className="proj-card-body">
+          {project.category && (
+            <div className="proj-card-cat">{project.category}</div>
+          )}
+          <h3 className="proj-card-title" style={{
             color: hovered ? "var(--accent)" : "#f0ece4",
-            marginBottom: "10px", letterSpacing: "0.04em",
-            transition: "color 0.25s ease",
           }}>{project.title}</h3>
 
-          {/* desc */}
-          <p style={{
-            fontSize: "13px", color: "#5a5a56",
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.8, marginBottom: "16px", flex: 1,
-          }}>{project.description}</p>
+          <p className="proj-card-desc">{project.description}</p>
 
-          {/* tags */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", marginBottom: "18px" }}>
-            {project.tags.map((tag) => (
-              <span key={tag} className="proj-tag" style={{
-                padding: "3px 8px",
-                background: "#0e0e0c", border: "1px solid #2a2a25",
-                borderRadius: "2px", fontSize: "9px",
-                fontFamily: "'JetBrains Mono', monospace",
-                color: "#6a6a60", letterSpacing: "0.06em",
-              }}>{tag}</span>
+          <div className="proj-tags">
+            {project.tags.map(tag => (
+              <span key={tag} className="proj-tag">{tag}</span>
             ))}
           </div>
 
-          {/* buttons */}
-          <div style={{ display: "flex", gap: "8px" }}>
-            <ProjBtn href={project.live} primary>Live Demo ↗</ProjBtn>
-            <ProjBtn href={project.github}>GitHub →</ProjBtn>
+          <div className="proj-card-btns">
+            {project.liveUrl && <ProjBtn href={project.liveUrl} primary>Live Demo ↗</ProjBtn>}
+            {project.githubUrl && <ProjBtn href={project.githubUrl}>GitHub →</ProjBtn>}
           </div>
         </div>
       </div>
@@ -329,19 +212,41 @@ function ProjectCard({
   );
 }
 
-// ── Button with magnetic effect ──
+// ── Skeleton card ─────────────────────────────────────────────────────────────
+function CardSkeleton() {
+  return (
+    <div style={{
+      background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+      borderRadius: "6px", overflow: "hidden",
+    }}>
+      <div className="proj-img-wrap proj-skel" />
+      <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
+        <div className="proj-skel" style={{ width: "60%", height: 20, borderRadius: 3 }} />
+        <div className="proj-skel" style={{ width: "90%", height: 11, borderRadius: 3 }} />
+        <div className="proj-skel" style={{ width: "75%", height: 11, borderRadius: 3 }} />
+        <div style={{ display: "flex", gap: 5, marginTop: 4 }}>
+          {[50, 65, 45, 55].map(w => (
+            <div key={w} className="proj-skel" style={{ width: w, height: 20, borderRadius: 2 }} />
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+          <div className="proj-skel" style={{ width: 90, height: 32, borderRadius: 3 }} />
+          <div className="proj-skel" style={{ width: 80, height: 32, borderRadius: 3 }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Button ────────────────────────────────────────────────────────────────────
 function ProjBtn({ children, href, primary }: {
   children: React.ReactNode; href: string; primary?: boolean;
 }) {
   const ref = useRef<HTMLAnchorElement>(null);
   return (
-    <a
-      ref={ref}
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <a ref={ref} href={href} target="_blank" rel="noopener noreferrer"
       className={primary ? "proj-btn-primary" : "proj-btn-secondary"}
-      onMouseMove={(e) => {
+      onMouseMove={e => {
         const el = ref.current; if (!el) return;
         const rect = el.getBoundingClientRect();
         const x = (e.clientX - rect.left - rect.width / 2) * 0.3;
@@ -349,28 +254,26 @@ function ProjBtn({ children, href, primary }: {
         gsap.to(el, { x, y, duration: 0.2, ease: "power2.out" });
       }}
       onMouseLeave={() => gsap.to(ref.current, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1,0.5)" })}
-    >
-      {children}
-    </a>
+    >{children}</a>
   );
 }
 
-// ── Filter Pill ──
+// ── Filter Pill ───────────────────────────────────────────────────────────────
 function FilterPill({ label, active, onClick, count }: {
   label: string; active: boolean; onClick: () => void; count: number;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   return (
-    <button
-      ref={ref}
-      onClick={onClick}
+    <button ref={ref} onClick={onClick}
       className={active ? "proj-filter active" : "proj-filter"}
-      onMouseMove={(e) => {
+      onMouseMove={e => {
         const el = ref.current; if (!el) return;
         const rect = el.getBoundingClientRect();
-        const x = (e.clientX - rect.left - rect.width / 2) * 0.25;
-        const y = (e.clientY - rect.top - rect.height / 2) * 0.25;
-        gsap.to(el, { x, y, duration: 0.2, ease: "power2.out" });
+        gsap.to(el, {
+          x: (e.clientX - rect.left - rect.width / 2) * 0.25,
+          y: (e.clientY - rect.top - rect.height / 2) * 0.25,
+          duration: 0.2, ease: "power2.out",
+        });
       }}
       onMouseLeave={() => gsap.to(ref.current, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1,0.5)" })}
     >
@@ -380,37 +283,29 @@ function FilterPill({ label, active, onClick, count }: {
   );
 }
 
-// ── GitHub CTA ──
+// ── GitHub CTA ────────────────────────────────────────────────────────────────
 function GithubCTA() {
   const ref = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
     if (!ref.current) return;
-    gsap.fromTo(ref.current,
-      { y: 20, opacity: 0 },
+    gsap.fromTo(ref.current, { y: 20, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.6, ease: "power3.out",
         scrollTrigger: { trigger: ref.current, start: "top 90%", once: true } }
     );
   }, []);
   return (
-    <a
-      ref={ref}
-      href="https://github.com/Ridoan-75?tab=repositories"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="proj-github-cta"
-      style={{ opacity: 0 }}
-      onMouseEnter={(e) => {
+    <a ref={ref} href="https://github.com/Ridoan-75?tab=repositories"
+      target="_blank" rel="noopener noreferrer"
+      className="proj-github-cta" style={{ opacity: 0 }}
+      onMouseEnter={e => {
         const el = e.currentTarget as HTMLElement;
         el.style.borderColor = "rgba(var(--accent-rgb),0.3)";
-        el.style.color = "var(--accent)";
-        el.style.background = "rgba(var(--accent-rgb),0.04)";
+        el.style.color = "var(--accent)"; el.style.background = "rgba(var(--accent-rgb),0.04)";
         gsap.to(el, { y: -3, scale: 1.03, duration: 0.25, ease: "power2.out" });
       }}
-      onMouseLeave={(e) => {
+      onMouseLeave={e => {
         const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = "#1e1e1a";
-        el.style.color = "#9a9a90";
-        el.style.background = "transparent";
+        el.style.borderColor = "#1e1e1a"; el.style.color = "#9a9a90"; el.style.background = "transparent";
         gsap.to(el, { y: 0, scale: 1, duration: 0.4, ease: "elastic.out(1,0.5)" });
       }}
     >
@@ -422,70 +317,70 @@ function GithubCTA() {
   );
 }
 
-// =============================================
-// 🏠 Main Projects Component
-// =============================================
+// ── Main Component ────────────────────────────────────────────────────────────
 export default function Projects() {
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [visibleProjects, setVisibleProjects] = useState(projects);
+  const [allProjects, setAllProjects]   = useState<Project[]>([]);
+  const [loading, setLoading]           = useState(true);
+  const [activeFilter, setActiveFilter] = useState<"all" | "featured">("all");
+  const [page, setPage]                 = useState(1);
   const headingRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const gridRef    = useRef<HTMLDivElement>(null);
 
-  const filteredProjects = activeFilter === "All"
-    ? projects
-    : projects.filter((p) => p.category === activeFilter);
+  useEffect(() => {
+    fetch("/api/project")
+      .then(r => r.json())
+      .then(d => { setAllProjects(Array.isArray(d) ? d : []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
 
-  const getCount = (f: string) =>
-    f === "All" ? projects.length : projects.filter((p) => p.category === f).length;
+  const filtered    = activeFilter === "featured" ? allProjects.filter(p => p.featured) : allProjects;
+  const totalPages  = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated   = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-  // filter change animate
-  const handleFilter = useCallback((f: string) => {
-    if (!gridRef.current) { setActiveFilter(f); return; }
+  const animateGrid = useCallback((cb: () => void) => {
+    if (!gridRef.current) { cb(); return; }
     gsap.to(gridRef.current, {
-      opacity: 0, y: 12, duration: 0.2, ease: "power2.in",
-      onComplete: () => {
-        setActiveFilter(f);
-        gsap.to(gridRef.current, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" });
-      }
+      opacity: 0, y: 10, duration: 0.18, ease: "power2.in",
+      onComplete: () => { cb(); gsap.to(gridRef.current, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }); },
     });
   }, []);
+
+  const handleFilter = useCallback((f: "all" | "featured") => {
+    animateGrid(() => { setActiveFilter(f); setPage(1); });
+  }, [animateGrid]);
+
+  const changePage = useCallback((p: number) => {
+    animateGrid(() => {
+      setPage(p);
+      setTimeout(() => {
+        const el = document.getElementById("projects");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    });
+  }, [animateGrid]);
 
   // heading entrance
   useEffect(() => {
     if (!headingRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(".proj-status-tag",
-        { y: 30, opacity: 0, scale: 0.9 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.7)", delay: 0.1,
-          scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true } }
-      );
-      gsap.fromTo(".proj-heading",
-        { y: 60, opacity: 0, skewY: 3 },
-        { y: 0, opacity: 1, skewY: 0, duration: 1, ease: "power4.out", delay: 0.25,
-          scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true } }
-      );
-      gsap.fromTo(".proj-role-line",
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", delay: 0.45,
-          scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true } }
-      );
-      gsap.fromTo(".proj-desc",
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out", delay: 0.6,
-          scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true } }
-      );
-      gsap.fromTo(".proj-filters-wrap",
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", delay: 0.72,
-          scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true } }
-      );
+      const trig = { trigger: headingRef.current, start: "top 82%", once: true };
+      gsap.fromTo(".proj-status-tag", { y: 30, opacity: 0, scale: 0.9 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.7)", delay: 0.1, scrollTrigger: trig });
+      gsap.fromTo(".proj-heading", { y: 60, opacity: 0, skewY: 3 },
+        { y: 0, opacity: 1, skewY: 0, duration: 1, ease: "power4.out", delay: 0.25, scrollTrigger: trig });
+      gsap.fromTo(".proj-role-line", { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", delay: 0.45, scrollTrigger: trig });
+      gsap.fromTo(".proj-desc", { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out", delay: 0.6, scrollTrigger: trig });
+      gsap.fromTo(".proj-filters-wrap", { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", delay: 0.72, scrollTrigger: trig });
     }, headingRef);
     return () => ctx.revert();
   }, []);
 
   // floating particles
   useEffect(() => {
-    document.querySelectorAll<HTMLElement>(".proj-float").forEach((el) => {
+    document.querySelectorAll<HTMLElement>(".proj-float").forEach(el => {
       gsap.to(el, {
         y: gsap.utils.random(-20, 20), x: gsap.utils.random(-10, 10),
         rotation: gsap.utils.random(-15, 15),
@@ -498,11 +393,9 @@ export default function Projects() {
   // stats entrance
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(".proj-stats",
-        { y: 20, opacity: 0 },
+      gsap.fromTo(".proj-stats", { y: 20, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.6, ease: "power2.out",
-          scrollTrigger: { trigger: ".proj-stats", start: "top 88%", once: true } }
-      );
+          scrollTrigger: { trigger: ".proj-stats", start: "top 88%", once: true } });
     });
     return () => ctx.revert();
   }, []);
@@ -512,314 +405,239 @@ export default function Projects() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-        #projects {
-          padding: 80px 60px 80px;
-          min-height: 100vh;
-          display: flex; flex-direction: column; justify-content: center;
-          background: #080808; color: #e8e4dc;
-          position: relative; overflow: hidden;
-          font-family: 'DM Sans', sans-serif;
-        }
-        #projects::before {
-          content: ''; position: absolute; inset: 0;
-          background-image:
-            linear-gradient(rgba(var(--accent-rgb),.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(var(--accent-rgb),.04) 1px, transparent 1px);
-          background-size: 44px 44px; pointer-events: none; z-index: 0;
-        }
-        .proj-corner-tl {
-          position: absolute; top: 0; left: 0; width: 180px; height: 180px;
-          border-right: 1px solid rgba(var(--accent-rgb),.08);
-          border-bottom: 1px solid rgba(var(--accent-rgb),.08); pointer-events: none;
-        }
-        .proj-corner-br {
-          position: absolute; bottom: 0; right: 0; width: 180px; height: 180px;
-          border-left: 1px solid rgba(var(--accent-rgb),.08);
-          border-top: 1px solid rgba(var(--accent-rgb),.08); pointer-events: none;
-        }
-        .proj-scanline {
-          position: absolute; left: 60px; right: 60px; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),.12), transparent);
-          top: 50%; pointer-events: none; z-index: 0;
-          animation: projScan 7s ease-in-out infinite;
-        }
-        @keyframes projScan {
-          0%,100% { transform: translateY(-140px); opacity: 0; }
-          15% { opacity: 1; } 85% { opacity: 1; }
-          100% { transform: translateY(140px); opacity: 0; }
-        }
-        .proj-inner { max-width: 1100px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+        #projects { min-height:100vh; display:flex; flex-direction:column; color:#e8e4dc; font-family:'DM Sans',sans-serif; }
+        .proj-corner-tl { position:absolute; top:0; left:0; width:180px; height:180px; border-right:1px solid rgba(var(--accent-rgb),.08); border-bottom:1px solid rgba(var(--accent-rgb),.08); pointer-events:none; }
+        .proj-corner-br { position:absolute; bottom:0; right:0; width:180px; height:180px; border-left:1px solid rgba(var(--accent-rgb),.08); border-top:1px solid rgba(var(--accent-rgb),.08); pointer-events:none; }
+        .proj-scanline { position:absolute; left:60px; right:60px; height:1px; background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.12),transparent); top:50%; pointer-events:none; z-index:0; animation:projScan 7s ease-in-out infinite; }
+        @keyframes projScan { 0%,100%{transform:translateY(-140px);opacity:0} 15%{opacity:1} 85%{opacity:1} 100%{transform:translateY(140px);opacity:0} }
+        .proj-inner { max-width:1100px; margin:0 auto; width:100%; position:relative; z-index:1; }
+        .proj-float { position:absolute; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.1em; opacity:.03; pointer-events:none; user-select:none; color:var(--accent); }
 
-        /* ── status tag ── */
-        .proj-status-tag {
-          display: inline-flex; align-items: center; gap: 8px;
-          background: rgba(var(--accent-rgb),.06); border: 1px solid rgba(var(--accent-rgb),.2);
-          border-radius: 3px; padding: 7px 14px;
-          width: fit-content; margin-bottom: 24px; opacity: 0;
-        }
-        .proj-status-dot {
-          width: 8px; height: 8px; border-radius: 50%;
-          background: var(--accent); box-shadow: 0 0 6px var(--accent);
-          animation: projBlink 2s ease infinite; flex-shrink: 0;
-        }
+        /* status tag */
+        .proj-status-tag { display:inline-flex; align-items:center; gap:8px; background:rgba(var(--accent-rgb),.06); border:1px solid rgba(var(--accent-rgb),.2); border-radius:3px; padding:7px 14px; width:fit-content; margin-bottom:24px; opacity:0; }
+        .proj-status-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent); animation:projBlink 2s ease infinite; flex-shrink:0; }
         @keyframes projBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
-        .proj-status-text {
-          font-family: 'JetBrains Mono', monospace; font-size: 13px;
-          letter-spacing: .1em; text-transform: uppercase; color: var(--accent);
-        }
+        .proj-status-text { font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
 
-        /* ── heading ── */
-        .proj-heading {
-          font-family: 'Bebas Neue', sans-serif;
-          font-size: clamp(56px, 10vw, 120px);
-          line-height: .92; letter-spacing: .02em;
-          color: #f0ece4; margin-bottom: 20px; opacity: 0;
-        }
-        .proj-heading .h-accent { color: var(--accent); }
+        /* heading */
+        .proj-heading { font-family:'Bebas Neue',sans-serif; font-size:clamp(56px,10vw,120px); line-height:.92; letter-spacing:.02em; color:#f0ece4; margin-bottom:20px; opacity:0; }
+        .proj-heading .h-accent { color:var(--accent); }
+        .proj-role-line { font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:.08em; text-transform:uppercase; color:#e8e4dc; margin-bottom:18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; opacity:0; }
+        .proj-role-line::before { content:''; width:28px; height:1px; background:var(--accent); flex-shrink:0; }
+        .proj-desc { font-size:16px; line-height:1.85; color:#c0bcb4; max-width:440px; margin-bottom:36px; opacity:0; }
 
-        /* ── role line ── */
-        .proj-role-line {
-          font-family: 'JetBrains Mono', monospace; font-size: 14px;
-          letter-spacing: .08em; text-transform: uppercase; color: #6a6a60;
-          margin-bottom: 18px;
-          display: flex; align-items: center; gap: 12px; flex-wrap: wrap; opacity: 0;
-        }
-        .proj-role-line::before { content: ''; width: 28px; height: 1px; background: var(--accent); flex-shrink: 0; }
+        /* filters */
+        .proj-filters-wrap { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:48px; opacity:0; }
+        .proj-filter { padding:7px 16px; border-radius:3px; cursor:pointer; border:1px solid #1a1a18; background:transparent; color:#7a7a70; font-size:11px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; gap:6px; transition:color .2s,border-color .2s,background .2s; }
+        .proj-filter:hover { color:#a0a098; border-color:#2a2a28; }
+        .proj-filter.active { border-color:rgba(var(--accent-rgb),.35); background:rgba(var(--accent-rgb),.07); color:var(--accent); }
+        .proj-filter-count { font-size:9px; padding:1px 5px; border-radius:2px; background:#0e0e0c; border:1px solid #1a1a18; color:#6a6a60; font-family:'JetBrains Mono',monospace; }
+        .proj-filter.active .proj-filter-count { background:rgba(var(--accent-rgb),.1); border-color:rgba(var(--accent-rgb),.2); color:var(--accent); }
 
-        /* ── desc ── */
-        .proj-desc {
-          font-size: 16px; line-height: 1.85; color: #4a4a44;
-          max-width: 440px; margin-bottom: 36px; opacity: 0;
-        }
+        /* card image area — aspect-ratio so it scales with card width */
+        .proj-img-wrap { aspect-ratio:16/9; min-height:140px; max-height:220px; background:#080808; border-bottom:1px solid #1a1a18; position:relative; overflow:hidden; flex-shrink:0; }
 
-        /* ── filters ── */
-        .proj-filters-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 48px; opacity: 0; }
-        .proj-filter {
-          padding: 7px 16px; border-radius: 3px; cursor: pointer;
-          border: 1px solid #1a1a18; background: transparent; color: #5a5a56;
-          font-size: 11px; font-family: 'JetBrains Mono', monospace;
-          letter-spacing: .1em; text-transform: uppercase;
-          display: flex; align-items: center; gap: 6px;
-          transition: color .2s, border-color .2s, background .2s;
-        }
-        .proj-filter:hover { color: #8a8a80; border-color: #2a2a28; }
-        .proj-filter.active {
-          border-color: rgba(var(--accent-rgb),.35); background: rgba(var(--accent-rgb),.07); color: var(--accent);
-        }
-        .proj-filter-count {
-          font-size: 9px; padding: 1px 5px; border-radius: 2px;
-          background: #0e0e0c; border: 1px solid #1a1a18; color: #5a5a56;
-          font-family: 'JetBrains Mono', monospace;
-        }
-        .proj-filter.active .proj-filter-count {
-          background: rgba(var(--accent-rgb),.1); border-color: rgba(var(--accent-rgb),.2); color: #a3e635;
-        }
+        /* card body */
+        .proj-card-body { padding:18px 20px; display:flex; flex-direction:column; flex:1; }
+        .proj-card-cat { display:inline-block; font-size:10px; font-family:'JetBrains Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); background:rgba(var(--accent-rgb),.12); border:1px solid rgba(var(--accent-rgb),.25); border-radius:3px; padding:3px 8px; margin-bottom:10px; font-weight:600; }
+        .proj-card-title { font-family:'Bebas Neue',sans-serif; font-size:20px; font-weight:400; margin-bottom:8px; letter-spacing:.04em; transition:color .25s ease; line-height:1.2; }
+        .proj-card-desc { font-size:13px; color:#9a9890; font-family:'DM Sans',sans-serif; line-height:1.75; margin-bottom:14px; flex:1; }
+        .proj-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
+        .proj-tag { padding:3px 8px; background:#0e0e0c; border:1px solid #2a2a25; border-radius:2px; font-size:9px; font-family:'JetBrains Mono',monospace; color:#7a7a70; letter-spacing:.06em; }
+        .proj-card-btns { display:flex; gap:8px; flex-wrap:wrap; }
 
-        /* ── buttons ── */
-        .proj-btn-primary {
-          display: inline-flex; align-items: center;
-          padding: 8px 16px; border-radius: 3px; font-size: 11px;
-          font-family: 'JetBrains Mono', monospace; letter-spacing: .08em;
-          text-decoration: none; cursor: pointer; text-transform: uppercase;
-          background: rgba(var(--accent-rgb),.07); border: 1px solid rgba(var(--accent-rgb),.22); color: var(--accent);
-          transition: background .2s, border-color .2s;
-        }
-        .proj-btn-primary:hover { background: rgba(var(--accent-rgb),.14); }
-        .proj-btn-secondary {
-          display: inline-flex; align-items: center;
-          padding: 8px 16px; border-radius: 3px; font-size: 11px;
-          font-family: 'JetBrains Mono', monospace; letter-spacing: .08em;
-          text-decoration: none; cursor: pointer; text-transform: uppercase;
-          background: transparent; border: 1px solid #1e1e1a; color: #6a6a60;
-          transition: border-color .2s, color .2s;
-        }
-        .proj-btn-secondary:hover { border-color: rgba(var(--accent-rgb),.22); color: var(--accent); }
+        /* buttons */
+        .proj-btn-primary { display:inline-flex; align-items:center; padding:8px 16px; border-radius:3px; font-size:11px; font-family:'JetBrains Mono',monospace; letter-spacing:.08em; text-decoration:none; cursor:pointer; text-transform:uppercase; background:rgba(var(--accent-rgb),.07); border:1px solid rgba(var(--accent-rgb),.22); color:var(--accent); transition:background .2s,border-color .2s; white-space:nowrap; }
+        .proj-btn-primary:hover { background:rgba(var(--accent-rgb),.14); }
+        .proj-btn-secondary { display:inline-flex; align-items:center; padding:8px 16px; border-radius:3px; font-size:11px; font-family:'JetBrains Mono',monospace; letter-spacing:.08em; text-decoration:none; cursor:pointer; text-transform:uppercase; background:transparent; border:1px solid #1e1e1a; color:#7a7a70; transition:border-color .2s,color .2s; white-space:nowrap; }
+        .proj-btn-secondary:hover { border-color:rgba(var(--accent-rgb),.22); color:var(--accent); }
 
-        /* ── github cta ── */
-        .proj-github-cta {
-          display: inline-flex; align-items: center; gap: 10px;
-          padding: 14px 28px; border-radius: 3px;
-          background: transparent; border: 1px solid #1e1e1a; color: #9a9a90;
-          font-size: 12px; font-family: 'JetBrains Mono', monospace;
-          letter-spacing: .1em; text-decoration: none; text-transform: uppercase;
-          transition: all .25s;
-        }
+        /* grid — auto columns: fills with min 280px, no fixed column count */
+        .proj-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
 
-        /* ── stats ── */
-        .proj-stats {
-          display: flex; align-items: stretch;
-          margin-top: 52px;
-          background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.014) 100%);
-          border: 1px solid rgba(255,255,255,0.08);
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 4px 20px rgba(0,0,0,0.28);
-          backdrop-filter: blur(14px) saturate(1.3);
-          -webkit-backdrop-filter: blur(14px) saturate(1.3);
-          border-radius: 6px;
-          overflow: hidden; width: fit-content; opacity: 0;
-        }
-        .proj-stat-item { padding: 16px 30px; border-right: 1px solid rgba(255,255,255,0.07); text-align: center; }
-        .proj-stat-item:last-child { border-right: none; }
-        .proj-stat-num {
-          font-family: 'Bebas Neue', sans-serif; font-size: 38px;
-          letter-spacing: .03em; line-height: 1;
-        }
-        .proj-stat-label {
-          font-family: 'JetBrains Mono', monospace; font-size: 11px;
-          text-transform: uppercase; letter-spacing: .12em; color: #3a3a36; margin-top: 4px;
-        }
+        /* pagination */
+        .proj-pagination { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:40px; flex-wrap:wrap; }
+        .proj-page-btn { padding:8px 18px; background:transparent; border:1px solid #1e1e1a; color:#7a7a70; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; border-radius:3px; transition:all .2s; }
+        .proj-page-btn:hover:not(:disabled) { border-color:rgba(var(--accent-rgb),.3); color:var(--accent); }
+        .proj-page-btn:disabled { opacity:.25; cursor:not-allowed; }
+        .proj-page-nums { display:flex; gap:5px; }
+        .proj-page-num { width:34px; height:34px; display:flex; align-items:center; justify-content:center; background:transparent; border:1px solid #1e1e1a; color:#7a7a70; font-family:'JetBrains Mono',monospace; font-size:11px; cursor:pointer; border-radius:3px; transition:all .2s; }
+        .proj-page-num:hover { border-color:rgba(var(--accent-rgb),.22); color:#9a9a90; }
+        .proj-page-num.active { background:rgba(var(--accent-rgb),.08); border-color:rgba(var(--accent-rgb),.35); color:var(--accent); }
 
-        /* ── float ── */
-        .proj-float {
-          position: absolute; font-family: 'JetBrains Mono', monospace;
-          font-size: 11px; letter-spacing: .1em; opacity: .03;
-          pointer-events: none; user-select: none; color: var(--accent);
-        }
+        /* skeleton */
+        @keyframes projSkelShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        .proj-skel { background:linear-gradient(90deg,#181816 25%,#222220 50%,#181816 75%); background-size:200% 100%; animation:projSkelShimmer 1.6s ease infinite; }
 
-        /* ── project grid ── */
-        .proj-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
-        }
+        /* stats */
+        .proj-stats { display:flex; align-items:stretch; margin-top:52px; background:linear-gradient(145deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.014) 100%); border:1px solid rgba(255,255,255,.08); box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 4px 20px rgba(0,0,0,.28); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:6px; overflow:hidden; width:fit-content; opacity:0; }
+        .proj-stat-item { padding:16px 30px; border-right:1px solid rgba(255,255,255,.07); text-align:center; }
+        .proj-stat-item:last-child { border-right:none; }
+        .proj-stat-num { font-family:'Bebas Neue',sans-serif; font-size:38px; letter-spacing:.03em; line-height:1; }
+        .proj-stat-label { font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:#7a7670; margin-top:4px; }
 
-        /* ── responsive — exact hero breakpoints ── */
-        @media (max-width: 1199px) {
-          #projects { padding: 80px 40px 80px; }
-          .proj-heading { font-size: clamp(52px, 8vw, 100px); }
-          .proj-corner-tl, .proj-corner-br { width: 120px; height: 120px; }
-          .proj-stat-item { padding: 14px 24px; }
-          .proj-stat-num { font-size: 34px; }
+        /* github cta */
+        .proj-github-cta { display:inline-flex; align-items:center; gap:10px; padding:14px 28px; border-radius:3px; background:transparent; border:1px solid #1e1e1a; color:#9a9a90; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; transition:all .25s; }
+
+        /* empty */
+        .proj-empty { text-align:center; padding:80px 20px; }
+        .proj-empty-title { font-family:'Bebas Neue',sans-serif; font-size:32px; color:#3a3a36; letter-spacing:.04em; margin-bottom:8px; }
+        .proj-empty-sub { font-family:'JetBrains Mono',monospace; font-size:11px; color:#3a3a36; letter-spacing:.08em; text-transform:uppercase; }
+
+        /* ── Responsive ── */
+        @media (max-width:1199px) {
+          .proj-heading{font-size:clamp(52px,8vw,100px)}
+          .proj-corner-tl,.proj-corner-br{width:120px;height:120px}
+          .proj-stat-item{padding:14px 24px} .proj-stat-num{font-size:34px}
         }
-        @media (max-width: 1023px) {
-          #projects { padding: 70px 32px 90px; }
-          .proj-heading { font-size: clamp(48px, 8vw, 80px); }
-          .proj-grid { grid-template-columns: repeat(2, 1fr); }
-          .proj-corner-tl, .proj-corner-br { width: 100px; height: 100px; }
-          .proj-scanline { left: 32px; right: 32px; }
+        @media (max-width:1023px) {
+          .proj-heading{font-size:clamp(48px,8vw,80px)}
+          .proj-grid{gap:16px}
+          .proj-card-body{padding:16px 18px}
+          .proj-card-title{font-size:18px}
+          .proj-card-desc{font-size:12px}
+          .proj-corner-tl,.proj-corner-br{width:100px;height:100px}
+          .proj-scanline{left:32px;right:32px}
         }
-        @media (max-width: 767px) {
-          #projects { padding: 60px 24px 90px; padding-top: 80px; }
-          .proj-heading { font-size: clamp(52px, 14vw, 80px); }
-          .proj-grid { grid-template-columns: 1fr; }
-          .proj-desc { font-size: 14px; max-width: 100%; }
-          .proj-stats { width: 100%; }
-          .proj-stat-item { flex: 1; padding: 14px 16px; }
-          .proj-corner-tl, .proj-corner-br { width: 80px; height: 80px; }
-          .proj-scanline { left: 24px; right: 24px; }
-          .proj-filters-wrap { gap: 6px; }
+        @media (max-width:767px) {
+          .proj-heading{font-size:clamp(52px,14vw,80px)}
+          .proj-grid{grid-template-columns:1fr;gap:14px}
+          .proj-desc{font-size:14px;max-width:100%}
+          .proj-stats{width:100%} .proj-stat-item{flex:1;padding:14px 12px}
+          .proj-corner-tl,.proj-corner-br{width:80px;height:80px}
+          .proj-scanline{left:24px;right:24px}
+          .proj-card-body{padding:18px 20px}
+          .proj-card-title{font-size:20px}
+          .proj-card-desc{font-size:13px}
         }
-        @media (max-width: 599px) {
-          #projects { padding: 50px 18px 80px; padding-top: 70px; }
-          .proj-heading { font-size: clamp(44px, 16vw, 64px); }
-          .proj-role-line { font-size: 10px; gap: 8px; letter-spacing: .06em; }
-          .proj-role-line::before { width: 20px; }
-          .proj-desc { font-size: 13px; }
-          .proj-stat-num { font-size: 28px; }
-          .proj-stat-item { padding: 12px 10px; }
-          .proj-corner-tl, .proj-corner-br { width: 60px; height: 60px; }
-          .proj-filters-wrap { flex-direction: column; align-items: flex-start; }
+        @media (max-width:599px) {
+          .proj-heading{font-size:clamp(44px,16vw,64px)}
+          .proj-role-line{font-size:10px;gap:8px;letter-spacing:.06em}
+          .proj-role-line::before{width:20px}
+          .proj-desc{font-size:13px}
+          .proj-card-body{padding:16px 18px}
+          .proj-card-title{font-size:19px}
+          .proj-stat-num{font-size:28px} .proj-stat-item{padding:12px 10px}
+          .proj-corner-tl,.proj-corner-br{width:60px;height:60px}
+          .proj-page-btn{padding:7px 12px;font-size:10px}
+          .proj-page-num{width:30px;height:30px;font-size:10px}
         }
-        @media (max-width: 379px) {
-          #projects { padding: 40px 14px 70px; padding-top: 60px; }
-          .proj-heading { font-size: clamp(38px, 18vw, 52px); }
-          .proj-corner-tl, .proj-corner-br { width: 40px; height: 40px; }
-          .proj-scanline { left: 14px; right: 14px; }
-          .proj-status-text { font-size: 11px; }
+        @media (max-width:379px) {
+          .proj-heading{font-size:clamp(38px,18vw,52px)}
+          .proj-corner-tl,.proj-corner-br{width:40px;height:40px}
+          .proj-card-body{padding:14px 16px}
         }
-        @media (hover: none) {
-          .proj-btn-primary:hover, .proj-btn-secondary:hover { transform: none !important; }
+        @media (hover:none) {
+          .proj-btn-primary:hover,.proj-btn-secondary:hover{transform:none!important}
         }
-        @media (min-width: 1600px) {
-          .proj-inner { max-width: 1300px; }
-          .proj-heading { font-size: clamp(80px, 9vw, 130px); }
-          .proj-desc { font-size: 17px; max-width: 500px; }
-          .proj-grid { grid-template-columns: repeat(3, 1fr); }
-          .proj-stat-item { padding: 18px 36px; }
-          .proj-stat-num { font-size: 42px; }
+        @media (min-width:1600px) {
+          .proj-inner{max-width:1300px}
+          .proj-heading{font-size:clamp(80px,9vw,130px)}
+          .proj-desc{font-size:17px;max-width:500px}
+          .proj-stat-item{padding:18px 36px} .proj-stat-num{font-size:42px}
         }
       `}</style>
 
       <section id="projects">
-        <div className="proj-corner-tl" />
-        <div className="proj-corner-br" />
-        <div className="proj-scanline" />
+        <div className="page-card">
+          <div className="proj-corner-tl" />
+          <div className="proj-corner-br" />
+          <div className="proj-scanline" />
 
-        {["const", "async", "=>", "return", "export", "type", "import", "{}"].map((t, i) => (
-          <div key={i} className="proj-float"
-            style={{ left: `${5 + i * 12}%`, top: `${10 + (i % 4) * 22}%` }}>{t}</div>
-        ))}
+          {["const","async","=>","return","export","type","import","{}"].map((t, i) => (
+            <div key={i} className="proj-float"
+              style={{ left: `${5 + i * 12}%`, top: `${10 + (i % 4) * 22}%` }}>{t}</div>
+          ))}
 
-        <div className="proj-inner">
+          <div className="proj-inner">
 
-          {/* ── heading ── */}
-          <div ref={headingRef}>
-            <div className="proj-status-tag">
-              <span className="proj-status-dot" />
-              <span className="proj-status-text">Selected Work</span>
-            </div>
-
-            <h2 className="proj-heading">
-              Featured <span className="h-accent">P</span>rojects
-            </h2>
-
-            <div className="proj-role-line">
-              Things I&apos;ve built with passion &amp; precision
-            </div>
-
-            <p className="proj-desc">
-              A curated collection of work — from SaaS platforms to creative
-              landing pages, all built with care and shipped to production.
-            </p>
-
-            {/* ── filters ── */}
-            <div className="proj-filters-wrap">
-              {filters.map((f) => (
-                <FilterPill
-                  key={f} label={f} active={activeFilter === f}
-                  onClick={() => handleFilter(f)} count={getCount(f)}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* ── grid ── */}
-          <div className="proj-grid" ref={gridRef}>
-            {filteredProjects.map((project, i) => (
-              <ProjectCard key={project.title} project={project} index={i} />
-            ))}
-          </div>
-
-          {/* ── stats strip ── */}
-          <div className="proj-stats">
-            <div className="proj-stat-item">
-              <div className="proj-stat-num" style={{ color: "var(--accent)" }}>{projects.length}+</div>
-              <div className="proj-stat-label">Projects</div>
-            </div>
-            <div className="proj-stat-item">
-              <div className="proj-stat-num" style={{ color: "#60a5fa" }}>
-                {projects.filter(p => p.featured).length}
+            {/* heading */}
+            <div ref={headingRef}>
+              <div className="proj-status-tag">
+                <span className="proj-status-dot" />
+                <span className="proj-status-text">Selected Work</span>
               </div>
-              <div className="proj-stat-label">Featured</div>
-            </div>
-            <div className="proj-stat-item">
-              <div className="proj-stat-num" style={{ color: "#f472b6" }}>
-                {[...new Set(projects.map(p => p.year))].length}
-              </div>
-              <div className="proj-stat-label">Years</div>
-            </div>
-            <div className="proj-stat-item">
-              <div className="proj-stat-num" style={{ color: "var(--accent)" }}>
-                {[...new Set(projects.flatMap(p => p.tags))].length}+
-              </div>
-              <div className="proj-stat-label">Technologies</div>
-            </div>
-          </div>
+              <h2 className="proj-heading">
+                Featured <span className="h-accent">P</span>rojects
+              </h2>
+              <div className="proj-role-line">Things I&apos;ve built with passion &amp; precision</div>
+              <p className="proj-desc">
+                A curated collection of work — from SaaS platforms to creative landing pages, all built with care and shipped to production.
+              </p>
 
-          {/* ── github cta ── */}
-          <div style={{ textAlign: "center", marginTop: "52px" }}>
-            <GithubCTA />
-          </div>
+              {/* filters */}
+              {!loading && (
+                <div className="proj-filters-wrap">
+                  <FilterPill label="All" active={activeFilter === "all"}
+                    onClick={() => handleFilter("all")} count={allProjects.length} />
+                  <FilterPill label="Featured" active={activeFilter === "featured"}
+                    onClick={() => handleFilter("featured")} count={allProjects.filter(p => p.featured).length} />
+                </div>
+              )}
+            </div>
 
+            {/* grid */}
+            <div className="proj-grid" ref={gridRef}>
+              {loading
+                ? Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)
+                : paginated.length === 0
+                ? (
+                  <div className="proj-empty" style={{ gridColumn: "1/-1" }}>
+                    <div className="proj-empty-title">No Projects Yet</div>
+                    <div className="proj-empty-sub">// Add projects from the admin panel</div>
+                  </div>
+                )
+                : paginated.map((project, i) => (
+                  <ProjectCard key={project.id} project={project} index={i} />
+                ))
+              }
+            </div>
+
+            {/* pagination */}
+            {!loading && totalPages > 1 && (
+              <div className="proj-pagination">
+                <button className="proj-page-btn" disabled={page === 1}
+                  onClick={() => changePage(page - 1)}>← Prev</button>
+                <div className="proj-page-nums">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                    <button key={p}
+                      className={`proj-page-num${p === page ? " active" : ""}`}
+                      onClick={() => changePage(p)}>{p}</button>
+                  ))}
+                </div>
+                <button className="proj-page-btn" disabled={page === totalPages}
+                  onClick={() => changePage(page + 1)}>Next →</button>
+              </div>
+            )}
+
+            {/* stats */}
+            {!loading && allProjects.length > 0 && (
+              <div className="proj-stats">
+                <div className="proj-stat-item">
+                  <div className="proj-stat-num" style={{ color: "var(--accent)" }}>{allProjects.length}+</div>
+                  <div className="proj-stat-label">Projects</div>
+                </div>
+                <div className="proj-stat-item">
+                  <div className="proj-stat-num" style={{ color: "#60a5fa" }}>
+                    {allProjects.filter(p => p.featured).length}
+                  </div>
+                  <div className="proj-stat-label">Featured</div>
+                </div>
+                <div className="proj-stat-item">
+                  <div className="proj-stat-num" style={{ color: "#93c5fd" }}>
+                    {[...new Set(allProjects.flatMap(p => p.tags))].length}+
+                  </div>
+                  <div className="proj-stat-label">Technologies</div>
+                </div>
+              </div>
+            )}
+
+            {/* github cta */}
+            <div style={{ textAlign: "center", marginTop: "52px" }}>
+              <GithubCTA />
+            </div>
+
+          </div>
         </div>
       </section>
     </>

@@ -1,105 +1,187 @@
-// components/PageLoader.tsx
 "use client";
 
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
 
-const techStack = [
-  "React",
-  "Next.js",
-  "TypeScript",
-  "Node.js",
-  "Tailwind CSS",
-  "GraphQL",
-  "PostgreSQL",
-  "UI/UX Design",
+const TECH = [
+  "React", "Next.js", "TypeScript", "Node.js",
+  "Tailwind CSS", "GraphQL", "PostgreSQL", "UI/UX Design",
+  "Prisma", "GSAP", "Framer Motion", "REST API",
+];
+
+const STATUS_MSGS = [
+  "initializing runtime...",
+  "loading assets...",
+  "compiling pages...",
+  "building components...",
+  "finalizing...",
+  "portfolio ready",
+];
+
+const SEGS = 30;
+
+/*
+  RIDOAN — 13 individual SVG strokes, drawn left-to-right
+  ViewBox 0 0 348 90
+
+  R  → 3 strokes (accent colour — first letter highlight)
+  I  → 1 stroke
+  D  → 2 strokes
+  O  → 1 stroke (4-segment bezier oval)
+  A  → 3 strokes
+  N  → 3 strokes
+*/
+const RIDOAN_PATHS: { d: string; accent: boolean }[] = [
+  // ── R (x: 4–46) ──
+  { d: "M 4,4 L 4,86",                                           accent: true  }, // vert
+  { d: "M 4,4 L 28,4 Q 46,4 46,26 Q 46,47 28,47 L 4,47",        accent: true  }, // bowl
+  { d: "M 22,47 L 46,86",                                        accent: true  }, // leg
+  // ── I (x: 62) ──
+  { d: "M 62,4 L 62,86",                                         accent: false }, // vert
+  // ── D (x: 78–130) ──
+  { d: "M 78,4 L 78,86",                                         accent: false }, // vert
+  { d: "M 78,4 L 103,4 Q 130,4 130,45 Q 130,86 103,86 L 78,86", accent: false }, // curve
+  // ── O (x: 144–202) — proper 4-segment bezier oval ──
+  { d: "M 173,4 C 190,4 202,22 202,45 C 202,68 190,86 173,86 C 156,86 144,68 144,45 C 144,22 156,4 173,4",
+                                                                  accent: false }, // oval
+  // ── A (x: 216–272) ──
+  { d: "M 216,86 L 244,4",                                       accent: false }, // left leg
+  { d: "M 244,4 L 272,86",                                       accent: false }, // right leg
+  { d: "M 229,54 L 259,54",                                      accent: false }, // crossbar
+  // ── N (x: 284–340) ──
+  { d: "M 284,4 L 284,86",                                       accent: false }, // left vert
+  { d: "M 284,4 L 340,86",                                       accent: false }, // diagonal
+  { d: "M 340,4 L 340,86",                                       accent: false }, // right vert
 ];
 
 export default function PageLoader() {
-  const [progress, setProgress] = useState(0);
-  const [visible, setVisible] = useState(true);
-  const [phase, setPhase] = useState<"loading" | "complete" | "reveal">(
-    "loading",
-  );
-  const [accent, setAccent] = useState("#c8f060");
-  const containerRef = useRef<HTMLDivElement>(null);
-  const nameRef = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
+  const [progress, setProgress]   = useState(0);
+  const [visible, setVisible]     = useState(true);
+  const [phase, setPhase]         = useState<"loading" | "complete" | "reveal">("loading");
+  // Read accent synchronously on first render — no async flash
+  const [accent] = useState<string>(() => {
+    if (typeof window === "undefined") return "#c8f060";
     try {
-      const saved = localStorage.getItem("site-settings");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.accent) setAccent(parsed.accent);
-      }
+      const s = localStorage.getItem("site-settings");
+      if (s) { const p = JSON.parse(s); if (p.accent) return p.accent as string; }
     } catch {}
-  }, []);
+    return "#c8f060";
+  });
+  const [statusIdx, setStatusIdx] = useState(0);
+  const [typed, setTyped]         = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const typingRef    = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // GSAP entrance animations
+  // typewriter for status messages
+  useEffect(() => {
+    if (typingRef.current) clearInterval(typingRef.current);
+    setTyped("");
+    const msg = STATUS_MSGS[statusIdx];
+    let i = 0;
+    typingRef.current = setInterval(() => {
+      i++;
+      setTyped(msg.slice(0, i));
+      if (i >= msg.length && typingRef.current) clearInterval(typingRef.current);
+    }, 36);
+    return () => { if (typingRef.current) clearInterval(typingRef.current); };
+  }, [statusIdx]);
+
+  // GSAP — runs once on mount, accent is already correct (lazy init)
   useEffect(() => {
     if (!containerRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".loader-status-tag",
-        { y: 20, opacity: 0, scale: 0.9 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.6,
-          ease: "back.out(1.7)",
-          delay: 0.3,
-        },
+
+      // corner brackets draw in
+      gsap.fromTo(".ld-br",
+        { strokeDashoffset: 90 },
+        { strokeDashoffset: 0, duration: 0.6, stagger: 0.09, ease: "power3.out", delay: 0.2 }
       );
-      gsap.fromTo(
-        ".loader-corner",
-        { opacity: 0, scale: 0.5 },
-        {
-          opacity: 1,
-          scale: 1,
-          duration: 0.7,
-          ease: "back.out(2)",
-          delay: 0.5,
-          stagger: 0.08,
-        },
+
+      // ── RIDOAN path draw-in ──
+      const paths = Array.from(
+        containerRef.current!.querySelectorAll<SVGPathElement>(".ld-ridoan-path")
       );
-      gsap.fromTo(
-        ".loader-track-dot",
-        { opacity: 0 },
-        { opacity: 1, duration: 0.4, delay: 0.8 },
+      paths.forEach(p => {
+        const len = p.getTotalLength();
+        p.style.strokeDasharray  = `${len}`;
+        p.style.strokeDashoffset = `${len}`;
+      });
+      // slower: 0.52s per stroke, 0.18s stagger → total ~2.9s for all 13 strokes
+      gsap.to(paths, {
+        strokeDashoffset: 0,
+        duration: 0.52,
+        stagger: 0.18,
+        ease: "power2.inOut",
+        delay: 0.35,
+        onComplete: () => {
+          gsap.fromTo(".ld-ridoan-svg",
+            { filter: `drop-shadow(0 0 0px transparent)` },
+            {
+              filter: `drop-shadow(0 0 20px ${accent}aa)`,
+              duration: 0.35, ease: "power2.out",
+              onComplete: () =>
+                gsap.to(".ld-ridoan-svg", {
+                  filter: `drop-shadow(0 0 8px ${accent}44)`,
+                  duration: 0.8, ease: "power2.inOut",
+                }),
+            }
+          );
+        },
+      });
+
+      // dividers appear near end of draw
+      gsap.fromTo(".ld-divider",
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.9, stagger: 0.15, ease: "expo.out", delay: 2.6 }
+      );
+
+      // role text after dividers
+      gsap.fromTo(".ld-role",
+        { opacity: 0, y: 8 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "power2.out", delay: 2.85 }
+      );
+
+      // progress + status — show early
+      gsap.fromTo(".ld-bottom",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", delay: 0.85 }
       );
     }, containerRef);
+
     return () => ctx.revert();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Progress animation
+  // progress tick
   useEffect(() => {
-    const duration = 2400;
-    const start = performance.now();
-
+    const dur = 2500;
+    const t0  = performance.now();
     const tick = (now: number) => {
-      const elapsed = now - start;
-      const raw = elapsed / duration;
-      // Eased — fast start, dramatic slowdown near end
-      const eased =
-        raw < 0.7
-          ? raw * 1.2
-          : 0.84 + Math.pow((raw - 0.7) / 0.3, 0.6) * 0.16;
-      const p = Math.min(Math.floor(eased * 100), 100);
+      const raw   = (now - t0) / dur;
+      const eased = raw < 0.7
+        ? raw * 1.2
+        : 0.84 + Math.pow((raw - 0.7) / 0.3, 0.6) * 0.16;
+      const p   = Math.min(Math.floor(eased * 100), 100);
+      const idx = Math.min(
+        Math.floor((p / 100) * (STATUS_MSGS.length - 1)),
+        STATUS_MSGS.length - 1
+      );
       setProgress(p);
+      setStatusIdx(prev => prev === idx ? prev : idx);
       if (p < 100) {
         requestAnimationFrame(tick);
       } else {
         setPhase("complete");
-        setTimeout(() => setPhase("reveal"), 700);
-        setTimeout(() => setVisible(false), 1400);
+        setTimeout(() => setPhase("reveal"), 820);
+        setTimeout(() => setVisible(false), 1520);
       }
     };
-
-    const timer = setTimeout(() => requestAnimationFrame(tick), 900);
-    return () => clearTimeout(timer);
+    const id = setTimeout(() => requestAnimationFrame(tick), 900);
+    return () => clearTimeout(id);
   }, []);
+
+  const filled = Math.round((progress / 100) * SEGS);
 
   return (
     <AnimatePresence>
@@ -109,461 +191,267 @@ export default function PageLoader() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
           style={{
-            position: "fixed",
-            inset: 0,
-            background: "#080808",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-            overflow: "hidden",
+            position: "fixed", inset: 0, zIndex: 9999, overflow: "hidden",
+            background: "#06070f",
+            display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center",
             fontFamily: "'DM Sans', sans-serif",
           }}
         >
           <style>{`
             @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-            .loader-grid-bg::before {
-              content: '';
-              position: absolute;
-              inset: 0;
+            /* grid */
+            .ld-grid::before {
+              content:''; position:absolute; inset:0;
               background-image:
-                linear-gradient(rgba(200,240,96,.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(200,240,96,.03) 1px, transparent 1px);
-              background-size: 44px 44px;
-              pointer-events: none;
+                linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+              background-size:48px 48px; pointer-events:none;
             }
 
-            .loader-scanline {
-              position: absolute;
-              left: 0; right: 0;
-              height: 1px;
-              background: linear-gradient(90deg, transparent, rgba(200,240,96,.1), transparent);
-              animation: loaderScan 4s ease-in-out infinite;
-              pointer-events: none;
+            /* scanline */
+            .ld-scan {
+              position:absolute; left:0; right:0; height:2px;
+              background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.18),transparent);
+              animation:ldScan 6.5s ease-in-out infinite; pointer-events:none; z-index:1;
+            }
+            @keyframes ldScan {
+              0%  {top:8%;  opacity:0}
+              8%  {opacity:1}
+              92% {opacity:1}
+              100%{top:92%;opacity:0}
             }
 
-            @keyframes loaderScan {
-              0%   { top: 20%; opacity: 0; }
-              10%  { opacity: 1; }
-              90%  { opacity: 1; }
-              100% { top: 80%; opacity: 0; }
+            /* corner brackets */
+            .ld-br {
+              fill:none; stroke:rgba(var(--accent-rgb),.6);
+              stroke-width:2; stroke-linecap:square;
+              stroke-dasharray:90; stroke-dashoffset:90;
             }
 
-            .loader-corner-tl {
-              position: absolute;
-              top: 0; left: 0;
-              width: 120px; height: 120px;
-              border-right: 1px solid rgba(200,240,96,.08);
-              border-bottom: 1px solid rgba(200,240,96,.08);
-              pointer-events: none;
+            /* RIDOAN SVG paths — stroke colour set via inline style (no CSS-var flash) */
+            .ld-ridoan-path {
+              fill:none;
+              stroke-linecap:round; stroke-linejoin:round;
+              stroke-width:3;
             }
 
-            .loader-corner-br {
-              position: absolute;
-              bottom: 0; right: 0;
-              width: 120px; height: 120px;
-              border-left: 1px solid rgba(200,240,96,.08);
-              border-top: 1px solid rgba(200,240,96,.08);
-              pointer-events: none;
+            /* dividers */
+            .ld-divider {
+              height:1px; transform-origin:center; transform:scaleX(0);
             }
 
-            .loader-track {
-              position: absolute;
-              width: 1px;
-              background: linear-gradient(to bottom, transparent, #1a1a18 30%, #1a1a18 70%, transparent);
-              top: 10%; bottom: 10%;
+            /* role */
+            .ld-role {
+              display:flex; align-items:center; gap:14px;
+              font-family:'JetBrains Mono',monospace;
+              font-size:12px; letter-spacing:.22em;
+              text-transform:uppercase; color:#b0aca4;
+              opacity:0;
             }
+            .ld-role-line { flex:1; height:1px; background:rgba(255,255,255,.1); }
 
-            .loader-track-left { left: 60px; }
-            .loader-track-right { right: 60px; }
-
-            .loader-track-dot {
-              position: absolute;
-              width: 5px; height: 5px;
-              border-radius: 50%;
-              background: var(--accent);
-              left: -2px;
-              box-shadow: 0 0 6px var(--accent);
-              animation: loaderTrack 3.5s ease-in-out infinite;
+            /* progress + status */
+            .ld-bottom { opacity:0; }
+            .ld-seg {
+              flex:1; height:5px; border-radius:1px;
+              transition:background .1s ease, box-shadow .1s ease;
             }
-
-            .loader-track-dot.rev {
-              animation-direction: reverse;
-              animation-delay: 1.5s;
+            .ld-status {
+              display:flex; align-items:center; gap:7px;
+              font-family:'JetBrains Mono',monospace;
+              font-size:12px; letter-spacing:.09em; color:#9a9690;
             }
-
-            @keyframes loaderTrack {
-              0%   { top: 0; }
-              100% { top: calc(100% - 5px); }
+            .ld-cursor {
+              display:inline-block; width:7px; height:13px;
+              background:var(--accent); border-radius:1px; flex-shrink:0;
+              animation:ldCursorBlink .7s step-end infinite;
             }
+            @keyframes ldCursorBlink { 0%,100%{opacity:.85} 50%{opacity:0} }
 
-            .loader-status-tag {
-              display: inline-flex;
-              align-items: center;
-              gap: 8px;
-              background: rgba(var(--accent-rgb),.06);
-              border: 1px solid rgba(var(--accent-rgb),.18);
-              border-radius: 3px;
-              padding: 6px 14px;
-              margin-bottom: 32px;
-              opacity: 0;
+            /* flash */
+            .ld-flash {
+              position:absolute; inset:0; pointer-events:none;
+              background:rgba(var(--accent-rgb),.04);
+              animation:ldFlash .55s ease forwards;
             }
+            @keyframes ldFlash { 0%{opacity:0} 35%{opacity:1} 100%{opacity:0} }
 
-            .loader-status-dot {
-              width: 7px; height: 7px;
-              border-radius: 50%;
-              background: var(--accent);
-              box-shadow: 0 0 6px var(--accent);
-              animation: loaderBlink 2s ease infinite;
-              flex-shrink: 0;
+            /* marquee */
+            .ld-marquee-wrap {
+              position:absolute; bottom:0; left:0; right:0; overflow:hidden;
+              border-top:1px solid rgba(255,255,255,.045);
+              background:rgba(4,4,10,.96); padding:10px 0;
             }
-
-            @keyframes loaderBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-            .loader-status-text {
-              font-family: 'JetBrains Mono', monospace;
-              font-size: 11px;
-              letter-spacing: .12em;
-              text-transform: uppercase;
-              color: var(--accent);
+            .ld-marquee-inner { display:flex; width:max-content; animation:ldMq 24s linear infinite; }
+            @keyframes ldMq { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+            .ld-marquee-item {
+              font-family:'JetBrains Mono',monospace; font-size:10px;
+              text-transform:uppercase; letter-spacing:.18em; color:#282824;
+              padding:0 26px; white-space:nowrap;
+              display:flex; align-items:center; gap:10px;
             }
+            .ld-sep { width:3px; height:3px; border-radius:50%; background:var(--accent); opacity:.38; flex-shrink:0; }
 
-            .loader-marquee-wrap {
-              position: absolute;
-              bottom: 0; left: 0; right: 0;
-              overflow: hidden;
-              border-top: 1px solid #1a1a18;
-              background: rgba(5,5,5,.9);
-              padding: 12px 0;
-            }
-
-            .loader-marquee-inner {
-              display: flex;
-              width: max-content;
-              animation: loaderMarquee 18s linear infinite;
-            }
-
-            @keyframes loaderMarquee {
-              from { transform: translateX(0); }
-              to   { transform: translateX(-50%); }
-            }
-
-            .loader-marquee-item {
-              font-family: 'JetBrains Mono', monospace;
-              font-size: 11px;
-              text-transform: uppercase;
-              letter-spacing: .15em;
-              color: #3a3a36;
-              padding: 0 28px;
-              white-space: nowrap;
-              display: flex;
-              align-items: center;
-              gap: 12px;
-              transition: color .3s;
-            }
-
-            .loader-marquee-dot {
-              width: 4px; height: 4px;
-              border-radius: 50%;
-              background: var(--accent);
-              opacity: .4;
-              flex-shrink: 0;
-            }
-
-            @media (max-width: 520px) {
-              .loader-track-left { left: 20px; }
-              .loader-track-right { right: 20px; }
-              .loader-corner-tl { width: 60px; height: 60px; }
-              .loader-corner-br { width: 60px; height: 60px; }
+            @media(max-width:520px){
+              .ld-ridoan-path { stroke-width:2.5; }
+              .ld-role { font-size:10px; letter-spacing:.16em; }
             }
           `}</style>
 
-          {/* Grid background */}
-          <div
-            className="loader-grid-bg"
-            style={{ position: "absolute", inset: 0 }}
-          />
+          {/* grid */}
+          <div className="ld-grid" style={{ position:"absolute", inset:0 }} />
+          <div className="ld-scan" />
 
-          {/* Scanline */}
-          <div className="loader-scanline" />
-
-          {/* Corner decorations */}
-          <div className="loader-corner loader-corner-tl" />
-          <div className="loader-corner loader-corner-br" />
-
-          {/* Track lines with animated dots */}
-          <div className="loader-track loader-track-left">
-            <span className="loader-track-dot" />
-          </div>
-          <div className="loader-track loader-track-right">
-            <span className="loader-track-dot rev" />
-          </div>
-
-          {/* Radial glow */}
+          {/* radial glow */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 0.35, scale: 1 }}
-            transition={{ delay: 0.4, duration: 1.5, ease: "easeOut" }}
+            initial={{ opacity:0 }} animate={{ opacity:1 }}
+            transition={{ delay:0.3, duration:2.5 }}
             style={{
-              position: "absolute",
-              width: "50vw",
-              height: "50vw",
-              maxWidth: 500,
-              maxHeight: 500,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(200,240,96,.05) 0%, transparent 65%)",
-              pointerEvents: "none",
+              position:"absolute", borderRadius:"50%", pointerEvents:"none",
+              width:"80vw", height:"80vw", maxWidth:760, maxHeight:760,
+              background:"radial-gradient(circle,rgba(var(--accent-rgb),.05) 0%,transparent 65%)",
             }}
           />
 
-          {/* Status tag */}
-          <div className="loader-status-tag">
-            <span className="loader-status-dot" />
-            <span className="loader-status-text">Loading Portfolio</span>
-          </div>
-
-          {/* Big decorative text behind */}
+          {/* faint watermark behind letters */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 1 }}
+            initial={{ opacity:0 }} animate={{ opacity:1 }}
+            transition={{ delay:0.6, duration:2.5 }}
             style={{
-              position: "absolute",
-              fontFamily: "'Bebas Neue', sans-serif",
-              fontSize: "clamp(120px, 25vw, 280px)",
-              color: "rgba(200,240,96,.02)",
-              letterSpacing: "-0.02em",
-              lineHeight: 1,
-              userSelect: "none",
-              pointerEvents: "none",
-              whiteSpace: "nowrap",
+              position:"absolute", userSelect:"none", pointerEvents:"none",
+              fontFamily:"'Bebas Neue',sans-serif",
+              fontSize:"clamp(200px,42vw,520px)",
+              color:"rgba(255,255,255,.008)",
+              letterSpacing:"-0.04em", lineHeight:1, whiteSpace:"nowrap",
             }}
           >
             RDN
           </motion.div>
 
-          {/* Name — per letter stagger */}
-          <div style={{ overflow: "hidden", marginBottom: 12 }}>
-            <motion.div
-              ref={nameRef}
-              style={{ display: "flex", gap: 0 }}
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: {},
-                visible: {
-                  transition: { staggerChildren: 0.05, delayChildren: 0.4 },
-                },
-              }}
-            >
-              {"RIDOAN".split("").map((char, i) => (
-                <motion.span
-                  key={i}
-                  variants={{
-                    hidden: { y: "130%", opacity: 0, skewY: 8 },
-                    visible: {
-                      y: 0,
-                      opacity: 1,
-                      skewY: 0,
-                      transition: {
-                        duration: 0.9,
-                        ease: [0.16, 1, 0.3, 1],
-                      },
-                    },
-                  }}
-                  style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    fontSize: "clamp(64px, 12vw, 130px)",
-                    color: i === 0 ? accent : "#f0ece4",
-                    letterSpacing: "0.04em",
-                    lineHeight: 0.92,
-                    display: "inline-block",
-                  }}
-                >
-                  {char}
-                </motion.span>
-              ))}
-            </motion.div>
+          {/* ── 4 corner brackets ── */}
+          <svg style={{ position:"absolute",top:24,left:24,width:44,height:44,overflow:"visible" }}>
+            <polyline className="ld-br" points="44,2 2,2 2,44" />
+          </svg>
+          <svg style={{ position:"absolute",top:24,right:24,width:44,height:44,overflow:"visible" }}>
+            <polyline className="ld-br" points="2,2 42,2 42,44" />
+          </svg>
+          <svg style={{ position:"absolute",bottom:44,left:24,width:44,height:44,overflow:"visible" }}>
+            <polyline className="ld-br" points="44,42 2,42 2,2" />
+          </svg>
+          <svg style={{ position:"absolute",bottom:44,right:24,width:44,height:44,overflow:"visible" }}>
+            <polyline className="ld-br" points="2,42 42,42 42,2" />
+          </svg>
+
+          {/* ══════════════════════════════════════════════
+              RIDOAN — 13 stroke paths drawn left→right
+              R(3) I(1) D(2) O(1) A(3) N(3)
+              stagger 0.105s × 12 + 0.38s draw = ~1.65s total
+          ══════════════════════════════════════════════ */}
+          <svg
+            className="ld-ridoan-svg"
+            viewBox="0 0 348 90"
+            style={{
+              width: "min(720px, 84vw)",
+              height: "auto",
+              display: "block",
+              marginBottom: 20,
+              flexShrink: 0,
+              filter: `drop-shadow(0 0 3px ${accent}22)`,
+            }}
+          >
+            {RIDOAN_PATHS.map((p, i) => (
+              <path
+                key={i}
+                className="ld-ridoan-path"
+                d={p.d}
+                style={{ stroke: p.accent ? accent : "rgba(240,236,228,.9)" }}
+              />
+            ))}
+          </svg>
+
+          {/* ── top divider ── */}
+          <div className="ld-divider" style={{
+            width:"min(560px,84vw)", marginBottom:16,
+            background:`linear-gradient(to right,transparent,${accent}65,transparent)`,
+          }} />
+
+          {/* ── FULL STACK DEVELOPER — visible ── */}
+          <div className="ld-role" style={{ width:"min(560px,84vw)", marginBottom:16 }}>
+            <div className="ld-role-line" />
+            Full Stack Developer
+            <div className="ld-role-line" />
           </div>
 
-          {/* Role line */}
-          <motion.div
-            initial={{ y: 15, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.6, ease: "easeOut" }}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginBottom: 40,
-            }}
-          >
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.9, duration: 0.5, ease: "easeOut" }}
-              style={{
-                width: 28,
-                height: 1,
-                background: accent,
-                transformOrigin: "left",
-              }}
-            />
-            <span
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 12,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#6a6a60",
-              }}
-            >
-              Full Stack Developer
-            </span>
-          </motion.div>
+          {/* ── bottom divider ── */}
+          <div className="ld-divider" style={{
+            width:"min(560px,84vw)", marginBottom:26,
+            background:`linear-gradient(to right,transparent,rgba(255,255,255,.12),transparent)`,
+          }} />
 
-          {/* Progress section */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 16,
-              width: "min(260px, 70vw)",
-            }}
-          >
-            {/* Progress track */}
-            <div
-              style={{
-                width: "100%",
-                height: 1,
-                background: "#1a1a18",
-                position: "relative",
-                overflow: "hidden",
-                borderRadius: 1,
-              }}
-            >
-              {/* Fill */}
-              <motion.div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  transformOrigin: "left",
-                  background:
-                    `linear-gradient(to right, ${accent}, ${accent}aa)`,
-                  scaleX: progress / 100,
-                }}
-                transition={{ ease: "linear", duration: 0.05 }}
-              />
-              {/* Glow at tip */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: -4,
-                  left: `${progress}%`,
-                  width: 8,
-                  height: 9,
-                  borderRadius: "50%",
-                  background: "rgba(200,240,96,.5)",
-                  filter: "blur(4px)",
-                  opacity: progress > 0 && progress < 100 ? 1 : 0,
-                  transition: "opacity 0.3s",
-                  pointerEvents: "none",
-                }}
-              />
+          {/* ── progress + status ── */}
+          <div className="ld-bottom" style={{ width:"min(560px,84vw)" }}>
+
+            {/* segmented bar */}
+            <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14 }}>
+              <div style={{ display:"flex", gap:3, flex:1 }}>
+                {Array.from({ length:SEGS }, (_,i) => (
+                  <div key={i} className="ld-seg" style={{
+                    background: i < filled
+                      ? (i === filled-1 ? accent : `${accent}bb`)
+                      : "rgba(255,255,255,.06)",
+                    boxShadow: i === filled-1
+                      ? `0 0 10px ${accent}, 0 0 22px ${accent}55`
+                      : "none",
+                  }} />
+                ))}
+              </div>
+              <span style={{
+                fontFamily:"'JetBrains Mono',monospace",
+                fontSize:13, minWidth:38, textAlign:"right",
+                color: progress > 40 ? accent : "#3a3a34",
+                transition:"color .4s", letterSpacing:"0.06em",
+              }}>
+                {String(progress).padStart(3,"0")}
+              </span>
             </div>
 
-            {/* Counter row */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <motion.span
-                animate={{
-                  color:
-                    phase === "complete" || phase === "reveal"
-                      ? accent
-                      : "#3a3a36",
-                }}
-                transition={{ duration: 0.4 }}
-                style={{
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: 11,
-                  fontWeight: 500,
-                  letterSpacing: "0.15em",
-                }}
-              >
-                {String(progress).padStart(3, "0")}
-              </motion.span>
-
-              <AnimatePresence>
-                {phase !== "loading" && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    style={{
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 10,
-                      color: accent,
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Complete
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-
-          {/* Tech marquee */}
-          <div className="loader-marquee-wrap">
-            <div className="loader-marquee-inner">
-              {[...techStack, ...techStack, ...techStack, ...techStack].map(
-                (item, i) => (
-                  <span key={i} className="loader-marquee-item">
-                    <span className="loader-marquee-dot" />
-                    {item}
-                  </span>
-                ),
-              )}
+            {/* typewriter status */}
+            <div className="ld-status">
+              <span style={{ color:accent }}>$</span>
+              <span>{typed}</span>
+              <span className="ld-cursor" />
             </div>
           </div>
 
-          {/* Reveal wipe */}
+          {/* complete flash */}
+          {phase !== "loading" && <div className="ld-flash" />}
+
+          {/* reveal wipe from bottom */}
           <AnimatePresence>
             {phase === "reveal" && (
-              <>
-                <motion.div
-                  initial={{ scaleY: 0 }}
-                  animate={{ scaleY: 1 }}
-                  transition={{
-                    duration: 0.6,
-                    ease: [0.76, 0, 0.24, 1],
-                  }}
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background: "#080808",
-                    transformOrigin: "bottom",
-                    zIndex: 10,
-                  }}
-                />
-              </>
+              <motion.div
+                initial={{ scaleY:0 }} animate={{ scaleY:1 }}
+                transition={{ duration:0.65, ease:[0.76,0,0.24,1] }}
+                style={{
+                  position:"absolute", inset:0, background:"#06070f",
+                  transformOrigin:"bottom", zIndex:10,
+                }}
+              />
             )}
           </AnimatePresence>
+
+          {/* tech marquee */}
+          <div className="ld-marquee-wrap">
+            <div className="ld-marquee-inner">
+              {[...TECH,...TECH,...TECH,...TECH].map((t,i) => (
+                <span key={i} className="ld-marquee-item">
+                  <span className="ld-sep" />{t}
+                </span>
+              ))}
+            </div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

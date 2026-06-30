@@ -11,10 +11,10 @@ export async function PUT(
     if (!token || !verifyToken(token)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;
-    const { title, description, thumbnail, tags, liveUrl, githubUrl, featured } = await req.json();
+    const { title, description, thumbnail, tags, category, liveUrl, githubUrl, featured } = await req.json();
     const project = await prisma.project.update({
       where: { id },
-      data: { title, description, thumbnail, tags, liveUrl, githubUrl, featured },
+      data: { title, description, thumbnail, tags, category: category || null, liveUrl, githubUrl, featured },
     });
     return NextResponse.json(project);
   } catch {

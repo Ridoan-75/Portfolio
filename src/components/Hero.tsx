@@ -17,11 +17,12 @@ const featureCards = [
     tag: "Writing & Thoughts",
     label: "The Blog",
     desc: "Dev notes, tutorials, and thoughts on full-stack development, design, and building products.",
+    skills: null,
     accent: true,
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
       </svg>
     ),
   },
@@ -31,24 +32,27 @@ const featureCards = [
     tag: "Featured Work",
     label: "Projects",
     desc: "50+ production-grade projects built with React, Next.js, Node.js, TypeScript and more.",
+    skills: null,
     accent: false,
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2" />
+        <polyline points="2 17 12 22 22 17" />
+        <polyline points="2 12 12 17 22 12" />
       </svg>
     ),
   },
   {
     id: "skills",
     href: "/skills",
-    tag: "Tech Stack",
-    label: "Skills",
-    desc: "React · Next.js · TypeScript · Node.js · PostgreSQL · Tailwind · GraphQL · Docker",
+    tag: null,
+    label: "Tools I Used",
+    desc: null,
+    skills: ["React", "Next.js", "TypeScript", "Node.js", "PostgreSQL", "Tailwind", "GraphQL", "Docker"],
     accent: false,
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="16 18 22 12 16 6" />
-        <polyline points="8 6 2 12 8 18" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
       </svg>
     ),
   },
@@ -58,10 +62,11 @@ const featureCards = [
     tag: "Testimonials",
     label: "Reviews",
     desc: "What clients and colleagues say about working with me on their projects worldwide.",
+    skills: null,
     accent: false,
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
       </svg>
     ),
   },
@@ -77,7 +82,7 @@ const navLinks = [
 ];
 
 function firework(x: number, y: number) {
-  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#c8f060";
+  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#3b82f6";
   const colors = [accent, "#ffffff", "#6a6a62"];
   for (let i = 0; i < 14; i++) {
     const dot = document.createElement("span");
@@ -138,7 +143,7 @@ export default function Hero() {
           color: #e8e4dc;
           position: relative;
           overflow: hidden;
-          padding: 60px 60px 40px;
+          padding: 60px;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -158,7 +163,7 @@ export default function Hero() {
         }
 
         .home-wrap {
-          max-width: 1000px;
+          max-width: 1100px;
           margin: 0 auto;
           width: 100%;
           position: relative;
@@ -251,8 +256,8 @@ export default function Hero() {
           width: 7px;
           height: 7px;
           border-radius: 50%;
-          background: #22c55e;
-          box-shadow: 0 0 7px #22c55e;
+          background: #3b82f6;
+          box-shadow: 0 0 7px #3b82f6;
           animation: homePulse 2s ease infinite;
           flex-shrink: 0;
         }
@@ -262,7 +267,7 @@ export default function Hero() {
         .home-status-text {
           font-family: 'JetBrains Mono', monospace;
           font-size: 10px;
-          color: #4ade80;
+          color: #93c5fd;
           letter-spacing: 0.06em;
         }
 
@@ -318,7 +323,6 @@ export default function Hero() {
           transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
           opacity: 0;
           position: relative;
-          overflow: hidden;
         }
 
         .home-feat-card::before {
@@ -384,19 +388,24 @@ export default function Hero() {
           margin-bottom: 14px;
         }
 
-        .home-feat-cta {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 10px;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: var(--accent);
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          transition: gap 0.2s;
+        .home-feat-skills {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 6px;
         }
 
-        .home-feat-card:hover .home-feat-cta { gap: 9px; }
+        .home-feat-skill-chip {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 9px;
+          letter-spacing: 0.04em;
+          color: var(--accent);
+          background: rgba(var(--accent-rgb), 0.08);
+          border: 1px solid rgba(var(--accent-rgb), 0.2);
+          border-radius: 4px;
+          padding: 3px 8px;
+          white-space: nowrap;
+        }
 
         /* ── BOTTOM NAV BAR ── */
         .home-nav-bar {
@@ -468,15 +477,23 @@ export default function Hero() {
           transform: translateY(-2px);
         }
 
-        /* ── RESPONSIVE ── */
-        @media (max-width: 1023px) {
-          #home { padding: 60px 40px 40px; }
+        /* ── RESPONSIVE — matches globals.css .page-card breakpoints ── */
+        @media (max-width: 1199px) {
+          #home { padding: 60px 40px; }
           .home-feat-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
+        @media (max-width: 1023px) {
+          #home { padding: 56px 32px; }
+        }
+
+        @media (max-width: 1024px) {
+          #home { padding-top: 40px; }
+        }
+
         @media (max-width: 767px) {
-          #home { padding: 80px 24px 40px; }
-          .home-about { gap: 16px; padding: 20px 20px; }
+          #home { padding: 36px 24px 64px; }
+          .home-about { gap: 16px; padding: 20px; }
           .home-stats { width: 100%; justify-content: center; }
           .home-about-name { font-size: 26px; }
           .home-about-bio { font-size: 13px; }
@@ -485,24 +502,26 @@ export default function Hero() {
         }
 
         @media (max-width: 599px) {
-          #home { padding: 70px 16px 32px; }
-          .home-wrap { gap: 24px; }
+          #home { padding: 32px 18px 56px; }
+          .home-wrap { gap: 20px; }
           .home-about { flex-direction: column; align-items: flex-start; gap: 14px; padding: 18px; }
           .home-stats { width: 100%; }
           .home-stat { flex: 1; padding: 10px 8px; }
           .home-stat-num { font-size: 22px; }
-          .home-feat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-          .home-feat-card { padding: 16px 14px; }
-          .home-feat-label { font-size: 18px; }
-          .home-feat-desc { font-size: 11px; }
+          .home-feat-grid { grid-template-columns: 1fr; gap: 10px; }
+          .home-feat-card { padding: 18px 16px; }
+          .home-feat-label { font-size: 20px; }
+          .home-feat-desc { font-size: 12px; line-height: 1.65; margin-bottom: 12px; }
           .home-nav-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
           .home-contact-btn { width: 100%; justify-content: center; }
           .home-nav-links { gap: 2px; }
           .home-nav-link { font-size: 10px; padding: 6px 9px; }
         }
 
-        @media (max-width: 400px) {
-          .home-feat-grid { grid-template-columns: 1fr; }
+        @media (max-width: 379px) {
+          #home { padding: 32px 14px 48px; }
+          .home-feat-grid { gap: 8px; }
+          .home-wrap { gap: 16px; }
         }
       `}</style>
 
@@ -552,16 +571,17 @@ export default function Hero() {
               onClick={(e) => handleCardClick(card.href, e)}
             >
               <div className="home-feat-icon">{card.icon}</div>
-              <div className="home-feat-tag">{card.tag}</div>
+              {card.tag && <div className="home-feat-tag">{card.tag}</div>}
               <div className="home-feat-label">{card.label}</div>
-              <p className="home-feat-desc">{card.desc}</p>
-              <span className="home-feat-cta">
-                View All
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </span>
+              {card.skills ? (
+                <div className="home-feat-skills">
+                  {card.skills.map((skill) => (
+                    <span key={skill} className="home-feat-skill-chip">{skill}</span>
+                  ))}
+                </div>
+              ) : (
+                <p className="home-feat-desc">{card.desc}</p>
+              )}
             </div>
           ))}
         </div>

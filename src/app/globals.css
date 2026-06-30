@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --accent: #c8f060;
-  --accent-rgb: 200,240,96;
-  --accent-glow: rgba(200,240,96,0.25);
+  --accent: #3b82f6;
+  --accent-rgb: 59,130,246;
+  --accent-glow: rgba(59,130,246,0.25);
   --site-font: 'DM Sans', sans-serif;
 }
 
@@ -124,9 +124,32 @@ body {
     to bottom,
     var(--accent) 0%,
     #60a5fa 50%,
-    #f472b6 100%
+    #bfdbfe 100%
   ) !important;
 }
+
+/* ── Page card — shared card wrapper for all sections ── */
+.page-card {
+  background: rgba(6,7,15,0.55);
+  border-left: 1px solid rgba(var(--accent-rgb),0.12);
+  border-right: 1px solid rgba(var(--accent-rgb),0.06);
+  border-top: none;
+  border-bottom: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0;
+  flex: 1;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding: 60px;
+}
+
+@media (max-width: 1199px) { .page-card { padding: 60px 40px; } }
+@media (max-width: 1023px) { .page-card { padding: 56px 32px; } }
+@media (max-width: 767px)  { .page-card { padding: 48px 24px 64px; } }
+@media (max-width: 599px)  { .page-card { padding: 40px 18px 56px; } }
+@media (max-width: 379px)  { .page-card { padding: 32px 14px 48px; } }
 
 /* ── Scroll to top button position ── */
 .stt-btn {
@@ -134,10 +157,26 @@ body {
   right: 32px !important;
 }
 
+/* Mobile topbar is 68px tall — all breakpoints must offset by at least that */
 @media (max-width: 1024px) {
   .portfolio-content-wrap {
     margin-left: 0 !important;
-    padding-top: 80px;
+    padding-top: 72px; /* 68px navbar + 4px gap */
+  }
+  .portfolio-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .portfolio-main {
+    padding-left: 0 !important;
+  }
+  /* Reduce page-card top padding since portfolio-content-wrap already offsets */
+  .page-card {
+    padding-top: 40px !important;
+  }
+  /* Sections without page-card also need top spacing */
+  #settings-page,
+  #reviews-section {
+    padding-top: 40px;
   }
 }
 
@@ -147,12 +186,20 @@ body {
     right: 24px !important;
   }
   .portfolio-content-wrap {
-    margin-left: 0 !important;
-    padding-top: 56px;
+    padding-top: 72px; /* keep same — navbar is still 68px */
+  }
+  .page-card {
+    padding-top: 36px !important;
   }
 }
 
 @media (max-width: 599px) {
+  .portfolio-content-wrap {
+    padding-top: 72px;
+  }
+  .page-card {
+    padding-top: 32px !important;
+  }
   .stt-btn {
     bottom: 20px !important;
     right: 20px !important;

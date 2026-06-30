@@ -8,8 +8,12 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter } as never);
 
 async function main() {
-  const email = process.env.ADMIN_EMAIL || "ridoan437@gmail.com";
-  const password = process.env.ADMIN_PASSWORD || "Portfolio@2026";
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD env vars are required");
+  }
 
   const hashed = await bcrypt.hash(password, 12);
 

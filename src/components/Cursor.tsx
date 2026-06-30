@@ -17,7 +17,7 @@ type CursorType =
 
 export default function Cursor() {
   const [cursorType, setCursorType] = useState<CursorType>("crosshair");
-  const [accent, setAccent] = useState("#c8f060");
+  const [accent, setAccent] = useState("#3b82f6");
   const [isMobile, setIsMobile] = useState(false);
 
   const ref1 = useRef<HTMLDivElement>(null);
@@ -48,7 +48,7 @@ export default function Cursor() {
         const s = JSON.parse(saved);
         queueMicrotask(() => {
           setCursorType(s.cursor || "crosshair");
-          setAccent(s.accent || "#c8f060");
+          setAccent(s.accent || "#3b82f6");
         });
       }
     } catch {}
