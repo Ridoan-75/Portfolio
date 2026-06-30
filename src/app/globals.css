@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --accent: #3b82f6;
-  --accent-rgb: 59,130,246;
-  --accent-glow: rgba(59,130,246,0.25);
+  --accent: #c8f060;
+  --accent-rgb: 200,240,96;
+  --accent-glow: rgba(200,240,96,0.28);
   --site-font: 'DM Sans', sans-serif;
 }
 
@@ -123,8 +123,8 @@ body {
   background: linear-gradient(
     to bottom,
     var(--accent) 0%,
-    #60a5fa 50%,
-    #bfdbfe 100%
+    #d9f99d 50%,
+    #f0fdf4 100%
   ) !important;
 }
 

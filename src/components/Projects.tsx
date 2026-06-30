@@ -584,7 +584,7 @@ export default function Projects() {
                 ? (
                   <div className="proj-empty" style={{ gridColumn: "1/-1" }}>
                     <div className="proj-empty-title">No Projects Yet</div>
-                    <div className="proj-empty-sub">// Add projects from the admin panel</div>
+                    <div className="proj-empty-sub">{"// Add projects from the admin panel"}</div>
                   </div>
                 )
                 : paginated.map((project, i) => (
@@ -618,13 +618,13 @@ export default function Projects() {
                   <div className="proj-stat-label">Projects</div>
                 </div>
                 <div className="proj-stat-item">
-                  <div className="proj-stat-num" style={{ color: "#60a5fa" }}>
+                  <div className="proj-stat-num" style={{ color: "#4ade80" }}>
                     {allProjects.filter(p => p.featured).length}
                   </div>
                   <div className="proj-stat-label">Featured</div>
                 </div>
                 <div className="proj-stat-item">
-                  <div className="proj-stat-num" style={{ color: "#93c5fd" }}>
+                  <div className="proj-stat-num" style={{ color: "#86efac" }}>
                     {[...new Set(allProjects.flatMap(p => p.tags))].length}+
                   </div>
                   <div className="proj-stat-label">Technologies</div>

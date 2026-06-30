@@ -1,19 +1,20 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export function ImageCarousel({ images, title }: { images: string[]; title: string }) {
   const [current, setCurrent] = useState(0);
   const hasMultiple = images.length >= 3;
 
-  const next = () => setCurrent((current + 1) % images.length);
-  const prev = () => setCurrent((current - 1 + images.length) % images.length);
+  const next = useCallback(() => setCurrent(c => (c + 1) % images.length), [images.length]);
+  const prev = () => setCurrent(c => (c - 1 + images.length) % images.length);
 
   useEffect(() => {
     if (!hasMultiple) return;
     const timer = setInterval(next, 5000);
     return () => clearInterval(timer);
-  }, [hasMultiple]);
+  }, [hasMultiple, next]);
 
   if (images.length === 0) return null;
 

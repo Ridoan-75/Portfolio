@@ -46,7 +46,7 @@ const educations: {
     institution: "Chattogram Polytechnic Institute · Chattogram, Bangladesh",
     period: "2021 – 2025",
     badge: "Ongoing",
-    badgeColor: "#3b82f6",
+    badgeColor: "#22c55e",
     tag: "02",
     subjects: ["Algorithms", "Data Structures", "OS", "Networking", "Web Dev"],
     description:
@@ -388,7 +388,7 @@ export default function Education() {
           position: absolute;
           left: 16px; top: 8px; bottom: 8px;
           width: 1px;
-          background: linear-gradient(to bottom, #22c55e 0%, #22c55e 33%, #3b82f6 33%, #3b82f6 66%, #6b7280 66%, #6b7280 100%);
+          background: linear-gradient(to bottom, #22c55e 0%, #22c55e 33%, #4ade80 33%, #4ade80 66%, #6b7280 66%, #6b7280 100%);
           border-radius: 2px;
         }
 
@@ -512,7 +512,7 @@ export default function Education() {
           box-shadow: 0 0 8px rgba(34,197,94,0.5);
         }
         .edu-progress-fill--ongoing {
-          background: linear-gradient(90deg, #3b82f6, #60a5fa);
+          background: linear-gradient(90deg, #22c55e, #4ade80);
           box-shadow: 0 0 8px rgba(59,130,246,0.4);
           animation: eduProgressPulse 2.5s ease-in-out infinite;
         }
@@ -820,7 +820,7 @@ export default function Education() {
               Completed
             </div>
             <div className="edu-legend-item">
-              <div className="edu-legend-dot" style={{ background: "#3b82f6", boxShadow: "0 0 6px rgba(59,130,246,0.4)", animation: "eduBlink 2s ease infinite" }} />
+              <div className="edu-legend-dot" style={{ background: "#4ade80", boxShadow: "0 0 6px rgba(74,222,128,0.4)", animation: "eduBlink 2s ease infinite" }} />
               Ongoing
             </div>
             <div className="edu-legend-item">
@@ -960,11 +960,11 @@ export default function Education() {
               <div className="edu-stat-label">Programs</div>
             </div>
             <div className="edu-stat-item">
-              <div className="edu-stat-num" style={{ color: "#60a5fa" }}>6+</div>
+              <div className="edu-stat-num" style={{ color: "#4ade80" }}>6+</div>
               <div className="edu-stat-label">Years Study</div>
             </div>
             <div className="edu-stat-item">
-              <div className="edu-stat-num" style={{ color: "#93c5fd" }}>15+</div>
+              <div className="edu-stat-num" style={{ color: "#86efac" }}>15+</div>
               <div className="edu-stat-label">Subjects</div>
             </div>
             <div className="edu-stat-item">

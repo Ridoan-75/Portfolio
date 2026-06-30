@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { soundManager } from "@/lib/SoundManager";
 
 type CursorType =
   | "default"
@@ -17,7 +16,7 @@ type CursorType =
 
 export default function Cursor() {
   const [cursorType, setCursorType] = useState<CursorType>("crosshair");
-  const [accent, setAccent] = useState("#3b82f6");
+  const [accent, setAccent] = useState("#c8f060");
   const [isMobile, setIsMobile] = useState(false);
 
   const ref1 = useRef<HTMLDivElement>(null);
@@ -48,7 +47,7 @@ export default function Cursor() {
         const s = JSON.parse(saved);
         queueMicrotask(() => {
           setCursorType(s.cursor || "crosshair");
-          setAccent(s.accent || "#3b82f6");
+          setAccent(s.accent || "#c8f060");
         });
       }
     } catch {}
@@ -405,7 +404,6 @@ export default function Cursor() {
 
     // ── hover: keep custom cursor visible ────────────────────────────────────
     const onEnter = (e: Event) => {
-      soundManager.playHover();
       const target = e.currentTarget as HTMLElement;
       target.style.setProperty("cursor", "none", "important");
     };
@@ -416,7 +414,6 @@ export default function Cursor() {
     };
 
     const onDown = (e: MouseEvent) => {
-      soundManager.playClick();
       const target = e.target as HTMLElement;
       const isInteractive = target.closest(
         "a, button, [role='button'], input[type='button'], input[type='submit'], select, label, .skill-item, .service-card, .blog-card, .testi-card, .journey-card"

@@ -1,6 +1,7 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { gsap } from "gsap";
 import { useRouter } from "next/navigation";
 
@@ -82,7 +83,7 @@ const navLinks = [
 ];
 
 function firework(x: number, y: number) {
-  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#3b82f6";
+  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#c8f060";
   const colors = [accent, "#ffffff", "#6a6a62"];
   for (let i = 0; i < 14; i++) {
     const dot = document.createElement("span");
@@ -256,8 +257,8 @@ export default function Hero() {
           width: 7px;
           height: 7px;
           border-radius: 50%;
-          background: #3b82f6;
-          box-shadow: 0 0 7px #3b82f6;
+          background: #c8f060;
+          box-shadow: 0 0 7px #c8f060;
           animation: homePulse 2s ease infinite;
           flex-shrink: 0;
         }
@@ -267,7 +268,7 @@ export default function Hero() {
         .home-status-text {
           font-family: 'JetBrains Mono', monospace;
           font-size: 10px;
-          color: #93c5fd;
+          color: #bbf7d0;
           letter-spacing: 0.06em;
         }
 

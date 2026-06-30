@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
-import { soundManager } from "@/lib/SoundManager";
 
 const TRACKS = [
   { id: 1, label: "Track 1", src: "/music/Track-1.mp3" },
@@ -21,7 +20,7 @@ interface Settings {
   accent: string; bg: BgType; cursor: CursorType;
   sound: boolean; clickSound: ClickSoundType; hoverSound: HoverSoundType;
 }
-const DEFAULTS: Settings = { accent:"#3b82f6", bg:"particles", cursor:"crosshair", sound:true, clickSound:"glitch", hoverSound:"tick" };
+const DEFAULTS: Settings = { accent:"#c8f060", bg:"particles", cursor:"crosshair", sound:true, clickSound:"glitch", hoverSound:"tick" };
 
 const ACCENTS = [
   { color:"#c8f060", name:"Lime"    }, { color:"#a3e635", name:"Green"   },
@@ -69,16 +68,18 @@ function applySettings(s: Settings) {
   r.style.setProperty("--accent", s.accent);
   r.style.setProperty("--accent-rgb", hexToRgbStr(s.accent));
   r.style.setProperty("--accent-glow", s.accent + "40");
-  soundManager.setEnabled(s.sound);
-  soundManager.setClickSound(s.clickSound);
-  soundManager.setHoverSound(s.hoverSound);
   localStorage.setItem("site-settings", JSON.stringify(s));
   window.dispatchEvent(new CustomEvent("site-settings-change", { detail: s }));
 }
 
 export default function SettingsPage() {
   const headingRef = useRef<HTMLDivElement>(null);
-  const [settings, setSettings] = useState<Settings>(DEFAULTS);
+  const [settings, setSettings] = useState<Settings>(() => {
+    try {
+      const raw = localStorage.getItem("site-settings");
+      return raw ? { ...DEFAULTS, ...JSON.parse(raw) } : DEFAULTS;
+    } catch { return DEFAULTS; }
+  });
   const audioRef = useRef<HTMLAudioElement>(null);
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
@@ -86,12 +87,6 @@ export default function SettingsPage() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("site-settings");
-      if (raw) setSettings({ ...DEFAULTS, ...JSON.parse(raw) });
-    } catch {}
-  }, []);
 
   useEffect(() => {
     if (!headingRef.current) return;
@@ -443,8 +438,8 @@ export default function SettingsPage() {
                 <div className="sc-sound-grid" style={{marginBottom:"14px"}}>
                   {CLICK_SOUNDS.map(s => (
                     <button key={s.id} className={`sc-sound-btn${settings.clickSound===s.id?" active":""}`}
-                      onClick={() => { update({clickSound:s.id}); soundManager.playClick(); }}
-                      onMouseEnter={() => soundManager.playClick()}>
+                      onClick={() => update({clickSound:s.id})}
+                      onMouseEnter={() => undefined}>
                       <span className="sc-sound-dot" />{s.label}
                     </button>
                   ))}
@@ -453,8 +448,8 @@ export default function SettingsPage() {
                 <div className="sc-sound-grid">
                   {HOVER_SOUNDS.map(s => (
                     <button key={s.id} className={`sc-sound-btn${settings.hoverSound===s.id?" active":""}`}
-                      onClick={() => { update({hoverSound:s.id}); soundManager.playHover(); }}
-                      onMouseEnter={() => soundManager.playHover()}>
+                      onClick={() => update({hoverSound:s.id})}
+                      onMouseEnter={() => undefined}>
                       <span className="sc-sound-dot" />{s.label}
                     </button>
                   ))}

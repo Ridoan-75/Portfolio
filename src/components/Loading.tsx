@@ -59,12 +59,18 @@ export default function PageLoader() {
   const [progress, setProgress]   = useState(0);
   const [visible, setVisible]     = useState(true);
   const [phase, setPhase]         = useState<"loading" | "complete" | "reveal">("loading");
-  // Read accent synchronously on first render — no async flash
-  const [accent] = useState<string>(() => {
+  const [accent, setAccent] = useState(() => {
     if (typeof window === "undefined") return "#c8f060";
+    const fromRoot = getComputedStyle(document.documentElement)
+      .getPropertyValue("--accent")
+      .trim();
+    if (fromRoot) return fromRoot;
     try {
       const s = localStorage.getItem("site-settings");
-      if (s) { const p = JSON.parse(s); if (p.accent) return p.accent as string; }
+      if (s) {
+        const p = JSON.parse(s);
+        if (p.accent) return p.accent as string;
+      }
     } catch {}
     return "#c8f060";
   });
@@ -73,9 +79,19 @@ export default function PageLoader() {
   const containerRef = useRef<HTMLDivElement>(null);
   const typingRef    = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  useEffect(() => {
+    const onSettings = (e: Event) => {
+      const d = (e as CustomEvent).detail;
+      if (d?.accent) setAccent(d.accent);
+    };
+    window.addEventListener("site-settings-change", onSettings);
+    return () => window.removeEventListener("site-settings-change", onSettings);
+  }, []);
+
   // typewriter for status messages
   useEffect(() => {
     if (typingRef.current) clearInterval(typingRef.current);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTyped("");
     const msg = STATUS_MSGS[statusIdx];
     let i = 0;

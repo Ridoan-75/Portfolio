@@ -43,9 +43,8 @@ export default function Reviews() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchReviews();
-  }, [fetchReviews]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchReviews(); }, [fetchReviews]);
 
   useEffect(() => {
     if (!headingRef.current) return;
@@ -233,10 +232,10 @@ export default function Reviews() {
         .rv-submit-btn:hover:not(:disabled) { filter: brightness(1.1); }
         .rv-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .rv-success {
-          background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2);
+          background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);
           border-radius: 6px; padding: 14px 18px; margin-bottom: 20px;
           font-family: 'JetBrains Mono', monospace; font-size: 12px;
-          color: #93c5fd; letter-spacing: 0.06em;
+          color: #86efac; letter-spacing: 0.06em;
         }
         .rv-empty {
           text-align: center; padding: 60px 20px;
@@ -311,7 +310,7 @@ export default function Reviews() {
           {/* Submit form */}
           <div className="rv-form-wrap">
             <div className="rv-form-title">Leave a Review</div>
-            <div className="rv-form-subtitle">// Share your experience working with me</div>
+            <div className="rv-form-subtitle">{"// Share your experience working with me"}</div>
 
             {submitted && (
               <div className="rv-success">✓ Review submitted! Thank you for your feedback.</div>

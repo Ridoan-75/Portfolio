@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import {
   Home, Cpu, User, FolderOpen, BookOpen,
-  Mail, Search, FileText, Layers, Star,
+  Mail, Search, FileText, Star,
 } from "lucide-react";
 
 type ItemType = "page" | "project" | "blog" | "skill";
@@ -75,6 +75,7 @@ export default function CommandPalette() {
   // Fetch content when palette opens
   useEffect(() => {
     if (!open) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
 
     const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "").trim().slice(0, 80);
@@ -123,7 +124,7 @@ export default function CommandPalette() {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
-        open ? closePalette() : openPalette();
+        if (open) closePalette(); else openPalette();
       }
       if (e.key === "Escape" && open) closePalette();
     };
@@ -146,6 +147,7 @@ export default function CommandPalette() {
     }
   }, [open]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setSelected(0); }, [query]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -379,6 +381,7 @@ export default function CommandPalette() {
                         <div
                           key={item.id}
                           className={`cp-item${globalIdx === selected ? " active" : ""}`}
+                          // eslint-disable-next-line react-hooks/refs
                           onClick={() => navigate(item)}
                           onMouseEnter={() => setSelected(globalIdx)}
                         >

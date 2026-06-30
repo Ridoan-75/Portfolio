@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
@@ -48,8 +49,8 @@ export default function Sidebar() {
     const accent =
       getComputedStyle(document.documentElement)
         .getPropertyValue("--accent")
-        .trim() || "#3b82f6";
-    const colors = [accent, "#93c5fd", "#ffffff", "#6a6a72"];
+        .trim() || "#c8f060";
+    const colors = [accent, "#ecfccb", "#ffffff", "#6a6a72"];
     for (let i = 0; i < 12; i++) {
       const dot = document.createElement("span");
       Object.assign(dot.style, {

@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
@@ -188,16 +189,16 @@ export default function About() {
         return (
           <div className="ab-intro-grid">
             <div className="ab-intro-card ab-card">
-              <div className="ab-intro-label">// About me</div>
+              <div className="ab-intro-label">{"// About me"}</div>
               <p className="ab-intro-text">
-                I'm Md Ridoan Hossen, a Full Stack Developer based in Chattogram, Bangladesh. I specialize in building modern web applications using React, Next.js, Node.js, and various databases.
+                I&apos;m Md Ridoan Hossen, a Full Stack Developer based in Chattogram, Bangladesh. I specialize in building modern web applications using React, Next.js, Node.js, and various databases.
               </p>
               <p className="ab-intro-text" style={{ marginTop: 14 }}>
-                I'm passionate about clean code, great UX, and learning new technologies. Outside of coding I enjoy exploring new frameworks, contributing to open source, and sharing knowledge with the community.
+                I&apos;m passionate about clean code, great UX, and learning new technologies. Outside of coding I enjoy exploring new frameworks, contributing to open source, and sharing knowledge with the community.
               </p>
             </div>
             <div className="ab-intro-card ab-card">
-              <div className="ab-intro-label">// Quick info</div>
+              <div className="ab-intro-label">{"// Quick info"}</div>
               {[
                 { key: "Name",         val: "Md Ridoan Hossen" },
                 { key: "Location",     val: "Chattogram, Bangladesh" },

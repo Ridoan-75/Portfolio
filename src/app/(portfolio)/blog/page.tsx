@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
@@ -393,7 +394,7 @@ export default function BlogPage() {
               ) : filtered.length === 0 ? (
                 <div className="bl-empty">
                   <div className="bl-empty-title">No Posts Yet</div>
-                  <div className="bl-empty-sub">// Coming soon — check back later</div>
+                  <div className="bl-empty-sub">{"// Coming soon — check back later"}</div>
                 </div>
               ) : (
                 paginated.map((blog, i) => (

@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useCallback, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -456,7 +457,7 @@ export default function HomeHero() {
           <div className="home-hero-copy">
             <span className="home-eyebrow">Full Stack Developer</span>
             <h1 className="home-title">
-              Hi, I'm <span className="h-accent">RIDOAN</span>
+              Hi, I&apos;m <span className="h-accent">RIDOAN</span>
             </h1>
             <p className="home-description">
               I explore through code, share with empathy, and reflect on every challenge. My work weaves web creation, product thinking, and open source. I thrive on collaborating with teams to build modern web solutions.

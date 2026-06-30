@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
@@ -353,7 +354,7 @@ export default function Skills() {
               <div className="sk-grid">
                 <div className="sk-empty">
                   <div className="sk-empty-title">No Skills Yet</div>
-                  <div className="sk-empty-sub">// Add skills from the admin panel</div>
+                  <div className="sk-empty-sub">{"// Add skills from the admin panel"}</div>
                 </div>
               </div>
             ) : (

@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -203,11 +204,9 @@ export default function BlogDetailPage() {
   const [loading, setLoading]   = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [copied, setCopied]     = useState(false);
-  const [shareUrl, setShareUrl] = useState("");
+  const [shareUrl] = useState(() => typeof window !== "undefined" ? window.location.href : "");
   const [lightbox, setLightbox] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => { setShareUrl(window.location.href); }, []);
 
   useEffect(() => {
     if (!lightbox) return;
@@ -518,7 +517,7 @@ export default function BlogDetailPage() {
         ) : notFound || !blog ? (
           <div className="bd-notfound">
             <div className="bd-notfound-title">Post Not Found</div>
-            <div className="bd-notfound-sub">// This post doesn&apos;t exist or was removed</div>
+            <div className="bd-notfound-sub">{"// This post doesn't exist or was removed"}</div>
           </div>
         ) : (
           <>
