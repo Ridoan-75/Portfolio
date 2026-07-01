@@ -13,20 +13,21 @@ type ItemType = "page" | "project" | "blog" | "skill";
 interface SearchItem {
   id: string;
   label: string;
-  href: string;
+  href?: string;
   desc: string;
   type: ItemType;
   icon: React.ElementType;
   tag?: string;
+  searchText?: string;
 }
 
 const PAGES: SearchItem[] = [
-  { id: "home",     label: "Home",     href: "/",        icon: Home,       desc: "Back to home",                                   type: "page" },
-  { id: "about",    label: "About",    href: "/about",   icon: User,       desc: "Intro, experience, education & certs",           type: "page" },
-  { id: "skills",   label: "Skills",   href: "/skills",  icon: Cpu,        desc: "Tech stack & proficiency",                       type: "page" },
-  { id: "projects", label: "Projects", href: "/projects",icon: FolderOpen, desc: "Portfolio projects",                             type: "page" },
-  { id: "blog",     label: "Blog",     href: "/blog",    icon: BookOpen,   desc: "Articles & thoughts",                           type: "page" },
-  { id: "contact",  label: "Contact",  href: "/contact", icon: Mail,       desc: "Get in touch",                                  type: "page" },
+  { id: "home",     label: "Home",     href: "/",        icon: Home,       desc: "Back to home",                                   type: "page", searchText: "home page welcome" },
+  { id: "about",    label: "About",    href: "/about",   icon: User,       desc: "Intro, experience, education & certs",           type: "page", tag: "resume cv curriculum vitae", searchText: "about resume cv curriculum vitae profile" },
+  { id: "skills",   label: "Skills",   href: "/skills",  icon: Cpu,        desc: "Tech stack & proficiency",                       type: "page", searchText: "skills tech stack proficiency" },
+  { id: "projects", label: "Projects", href: "/projects",icon: FolderOpen, desc: "Portfolio projects",                             type: "page", searchText: "projects work portfolio" },
+  { id: "blog",     label: "Blog",     href: "/blog",    icon: BookOpen,   desc: "Articles & thoughts",                           type: "page", searchText: "blog articles posts" },
+  { id: "contact",  label: "Contact",  href: "/contact", icon: Mail,       desc: "Get in touch",                                  type: "page", searchText: "contact email message" },
 ];
 
 const TYPE_LABELS: Record<ItemType, string> = {
@@ -46,13 +47,14 @@ export default function CommandPalette() {
   const inputRef  = useRef<HTMLInputElement>(null);
   const router    = useRouter();
 
-  const filtered = allItems.filter(
-    (p) =>
-      p.label.toLowerCase().includes(query.toLowerCase()) ||
-      p.desc.toLowerCase().includes(query.toLowerCase()) ||
-      (p.tag ?? "").toLowerCase().includes(query.toLowerCase()) ||
-      p.type.toLowerCase().includes(query.toLowerCase())
-  );
+  // Show only pages by default, or filter all items when searching
+  const normalizedQuery = query.trim().toLowerCase();
+  const filtered = normalizedQuery === ""
+    ? PAGES
+    : allItems.filter((p) => {
+      const searchText = (p.searchText ?? `${p.label} ${p.desc} ${(p.tag ?? "")} ${p.type}`).toLowerCase();
+      return searchText.includes(normalizedQuery);
+    });
 
   const openPalette = useCallback(() => {
     setQuery(""); setSelected(0); setOpen(true);
@@ -68,8 +70,10 @@ export default function CommandPalette() {
   }, []);
 
   const navigate = useCallback((item: SearchItem) => {
+    const href = item.href;
+    if (!href) return;
     closePalette();
-    setTimeout(() => router.push(item.href), 220);
+    setTimeout(() => router.push(href), 220);
   }, [closePalette, router]);
 
   // Fetch content when palette opens
@@ -93,6 +97,7 @@ export default function CommandPalette() {
         type: "project" as ItemType,
         icon: FolderOpen,
         tag: p.category ?? undefined,
+        searchText: `${p.title} ${stripHtml(p.description ?? "")} ${(p.tags ?? []).join(" ")} ${p.category ?? ""} project`,
       }));
 
       const blogItems: SearchItem[] = (Array.isArray(blogs) ? blogs : []).map((b: { id: string; title: string; content?: string; category?: string; tags?: string[] }) => ({
@@ -103,6 +108,7 @@ export default function CommandPalette() {
         type: "blog" as ItemType,
         icon: FileText,
         tag: b.category ?? undefined,
+        searchText: `${b.title} ${stripHtml(b.content ?? "")} ${(b.tags ?? []).join(" ")} ${b.category ?? ""} blog`,
       }));
 
       const skillItems: SearchItem[] = (Array.isArray(skills) ? skills : []).map((s: { id: string; name: string; category?: string }) => ({
@@ -113,6 +119,7 @@ export default function CommandPalette() {
         type: "skill" as ItemType,
         icon: Star,
         tag: s.category ?? undefined,
+        searchText: `${s.name} ${s.category ?? ""} skill`,
       }));
 
       setAllItems([...PAGES, ...projectItems, ...blogItems, ...skillItems]);
@@ -171,46 +178,87 @@ export default function CommandPalette() {
       <style>{`
         .cp-overlay {
           position: fixed; inset: 0; z-index: 9000;
-          background: rgba(0,0,0,0.7);
+          background: rgba(0,0,0,0.6);
           backdrop-filter: blur(8px);
           display: flex; align-items: flex-start; justify-content: center;
-          padding-top: 14vh;
+          padding-top: 20px;
+          animation: cpOverlayFadeIn 0.3s ease-out;
+        }
+        @keyframes cpOverlayFadeIn {
+          from { background: rgba(0,0,0,0); }
+          to { background: rgba(0,0,0,0.6); }
         }
 
         .cp-panel {
-          width: 100%; max-width: 660px;
+          width: calc(100% - 32px); max-width: 660px;
           background: rgba(8,8,10,0.98);
           border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 14px;
+          border-radius: 12px;
           box-shadow:
             0 32px 100px rgba(0,0,0,0.8),
             0 0 0 1px rgba(var(--accent-rgb),0.08),
             0 0 40px rgba(var(--accent-rgb),0.04);
           overflow: hidden;
+          animation: cpPanelDropIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes cpPanelDropIn {
+          from { transform: translateY(-40px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+          .cp-panel {
+            width: calc(100% - 24px);
+            border-radius: 10px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .cp-overlay {
+            padding-top: 12px;
+          }
+          .cp-panel {
+            width: calc(100% - 16px);
+            border-radius: 8px;
+          }
         }
 
         .cp-input-wrap {
           display: flex; align-items: center; gap: 12px;
-          padding: 18px 20px;
+          padding: 16px 18px;
           border-bottom: 1px solid #1e1e1c;
         }
-        .cp-input-icon { color: #a0a098; flex-shrink: 0; }
+        .cp-input-icon { color: #a0a098; flex-shrink: 0; display: flex; }
         .cp-input {
           flex: 1; background: transparent; border: none; outline: none;
-          font-family: 'DM Sans', sans-serif; font-size: 16px;
+          font-family: 'DM Sans', sans-serif; font-size: 15px;
           color: #f0ece4; caret-color: var(--accent);
         }
         .cp-input::placeholder { color: #8a8a80; }
         .cp-esc-kbd {
-          font-family: 'JetBrains Mono', monospace; font-size: 11px;
+          font-family: 'JetBrains Mono', monospace; font-size: 10px;
           color: #a0a098; background: #1a1a18; border: 1px solid #2e2e2c;
-          border-radius: 5px; padding: 3px 9px; letter-spacing: 0.06em;
+          border-radius: 4px; padding: 2px 7px; letter-spacing: 0.06em;
           flex-shrink: 0;
+        }
+
+        @media (max-width: 480px) {
+          .cp-input-wrap {
+            padding: 14px 14px;
+            gap: 10px;
+          }
+          .cp-input {
+            font-size: 14px;
+          }
+          .cp-esc-kbd {
+            font-size: 9px;
+            padding: 2px 6px;
+          }
         }
 
         .cp-results {
           max-height: 420px;
-          min-height: 220px;
+          min-height: 200px;
           overflow-y: auto;
           overflow-x: hidden;
           padding: 8px;
@@ -219,6 +267,21 @@ export default function CommandPalette() {
           touch-action: pan-y;
           display: flex;
           flex-direction: column;
+        }
+
+        @media (max-width: 768px) {
+          .cp-results {
+            max-height: 360px;
+            min-height: 180px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .cp-results {
+            max-height: 300px;
+            min-height: 160px;
+            padding: 6px;
+          }
         }
         .cp-results::-webkit-scrollbar { width: 4px; }
         .cp-results::-webkit-scrollbar-track { background: transparent; }
@@ -234,7 +297,7 @@ export default function CommandPalette() {
 
         .cp-item {
           display: flex; align-items: center; gap: 12px;
-          padding: 10px 12px; border-radius: 9px;
+          padding: 10px 12px; border-radius: 8px;
           cursor: pointer; transition: background 0.12s;
           border: 1px solid transparent;
         }
@@ -242,6 +305,14 @@ export default function CommandPalette() {
         .cp-item.active {
           background: rgba(var(--accent-rgb),0.08);
           border-color: rgba(var(--accent-rgb),0.18);
+        }
+
+        @media (max-width: 480px) {
+          .cp-item {
+            padding: 8px 10px;
+            gap: 10px;
+            border-radius: 6px;
+          }
         }
 
         .cp-item-icon {
@@ -271,6 +342,24 @@ export default function CommandPalette() {
           transition: color 0.12s;
         }
         .cp-item.active .cp-item-desc { color: rgba(var(--accent-rgb),0.8); }
+
+        @media (max-width: 480px) {
+          .cp-item-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+          }
+          .cp-item-label {
+            font-size: 13px;
+          }
+          .cp-item-desc {
+            font-size: 10px;
+          }
+          .cp-item-tag {
+            font-size: 8px;
+            padding: 1px 5px;
+          }
+        }
 
         .cp-item-right { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-shrink: 0; }
 
@@ -330,9 +419,22 @@ export default function CommandPalette() {
         }
 
         @media (max-width: 640px) {
-          .cp-overlay { padding-top: 0; align-items: flex-end; }
-          .cp-panel { max-width: 100%; border-radius: 16px 16px 0 0; border-bottom: none; }
-          .cp-results { max-height: 55vh; min-height: 200px; }
+          .cp-overlay {
+            padding-top: env(safe-area-inset-top, 12px);
+            padding-bottom: env(safe-area-inset-bottom, 12px);
+            align-items: flex-start;
+            justify-content: flex-start;
+          }
+          .cp-panel {
+            width: calc(100% - 16px);
+            max-width: 100%;
+            margin: 12px auto 0;
+            border-radius: 16px 16px 0 0;
+            border-bottom: none;
+            max-height: calc(100dvh - 24px);
+            min-height: 0;
+          }
+          .cp-results { max-height: 50vh; min-height: 180px; }
           .cp-footer { gap: 12px; font-size: 10px; }
           .cp-footer-kbd { padding: 2px 6px; font-size: 9px; }
         }

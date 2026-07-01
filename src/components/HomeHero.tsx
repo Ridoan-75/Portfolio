@@ -32,6 +32,22 @@ function EyeIcon() {
   );
 }
 
+// ── Skeleton Loaders ──────────────────────────────────────────────────────────
+function SkillsRowSkeleton() {
+  return (
+    <div className="skill-lane-card skill-lane-card-skel">
+      <div className="skill-lane-track" style={{ gap: 10 }}>
+        {[...Array(7)].map((_, i) => (
+          <div key={i} className="skill-chip skill-chip-skel">
+            <div className="skill-icon-wrap skill-icon-skel" />
+            <div className="skill-name-skel" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SocialIcon({ kind }: { kind: string }) {
   switch (kind) {
     case "facebook":
@@ -75,17 +91,18 @@ export default function HomeHero() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [blogIdx, setBlogIdx] = useState(0);
-  // skills kept for marquee section
+  const [blogsLoading, setBlogsLoading] = useState(true);
+  const [skillsLoading, setSkillsLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/blog")
       .then((r) => r.json())
-      .then((d: Blog[]) => setBlogs(Array.isArray(d) ? d.slice(0, 6) : []))
-      .catch(() => {});
+      .then((d: Blog[]) => { setBlogs(Array.isArray(d) ? d.slice(0, 6) : []); setBlogsLoading(false); })
+      .catch(() => setBlogsLoading(false));
     fetch("/api/skills")
       .then((r) => r.json())
-      .then((d: Skill[]) => setSkills(Array.isArray(d) ? d : []))
-      .catch(() => {});
+      .then((d: Skill[]) => { setSkills(Array.isArray(d) ? d : []); setSkillsLoading(false); })
+      .catch(() => setSkillsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -494,6 +511,26 @@ export default function HomeHero() {
 
         /* ══ BREAKPOINTS ══ */
 
+        /* Blog Loading Spinner */
+        .blog-loading-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 380px;
+          padding: 40px 20px;
+        }
+        .blog-loading-spinner {
+          width: 50px;
+          height: 50px;
+          border: 3px solid rgba(var(--accent-rgb), 0.2);
+          border-top-color: var(--accent);
+          border-radius: 50%;
+          animation: blogSpinnerRotate 1s linear infinite;
+        }
+        @keyframes blogSpinnerRotate {
+          to { transform: rotate(360deg); }
+        }
+
         /* 3D coverflow — all screens wider than 700px (includes tablets at 973px) */
         @media (min-width: 701px) {
           .blog-coverflow { height: 420px; perspective: 1100px; perspective-origin: 50% 50%; }
@@ -513,6 +550,94 @@ export default function HomeHero() {
           }
           .cf-card-wrap:not(.cf-center) { display: none !important; }
           .blog-carousel-card { width: 100%; }
+        }
+
+        /* Skeleton loaders */
+        @keyframes homeSkelShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        @keyframes homeSkelPulse { 0%{opacity:0.7} 50%{opacity:1} 100%{opacity:0.7} }
+        /* Blog skeleton - with animations */
+        .blog-coverflow .hb-skel-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; animation:homeSkelPulse 2s ease-in-out infinite; }
+        .blog-coverflow .hb-skel-img { aspect-ratio:16/9; background:linear-gradient(90deg,#181816 25%,#222220 50%,#181816 75%); background-size:200% 100%; animation:homeSkelShimmer 1.6s ease-in-out infinite; }
+        .blog-coverflow .hb-skel-bar { background:linear-gradient(90deg,#1a1a18 25%,#2a2a28 50%,#1a1a18 75%); background-size:200% 100%; animation:homeSkelShimmer 1.6s ease-in-out infinite; border-radius:4px; }
+        /* Generic skeleton */
+        .hb-skel-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; }
+        .hb-skel-img { aspect-ratio:16/9; background:linear-gradient(90deg,#181816 25%,#222220 50%,#181816 75%); background-size:200% 100%; }
+        .hb-skel-bar { background:linear-gradient(90deg,#1a1a18 25%,#2a2a28 50%,#1a1a18 75%); background-size:200% 100%; border-radius:4px; }
+        .hb-skel-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; width: 100%; max-width: 100%; justify-items: center; overflow: hidden; }
+        .hb-skel-card-wrap { width: min(360px, 100%); max-width: 100%; transform-origin: center; overflow: hidden; }
+        .hb-skel-card-wrap.hb-skel-pos-0 { transform: scale(1); }
+        .hb-skel-card-wrap.hb-skel-pos-1 { transform: translateX(-18px) scale(0.96); opacity: 0.88; }
+        .hb-skel-card-wrap.hb-skel-pos-2 { transform: translateX(18px) scale(0.96); opacity: 0.88; }
+        .hb-skel-tag-row { display: flex; gap: 8px; }
+        .hb-skel-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+        .skill-lane-card-skel { padding: clamp(12px, 1vw, 14px) 0; overflow: hidden; }
+        .skill-chip-skel { background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; min-width: 100px; white-space: nowrap; flex-shrink: 0; }
+        .skill-icon-skel { width: 20px; height: 20px; background: linear-gradient(90deg,#1a1a18 25%,#2a2a28 50%,#1a1a18 75%); background-size:200% 100%; border-radius: 8px; }
+        .skill-name-skel { flex: 1; min-width: 50px; height: 10px; background: linear-gradient(90deg,#1a1a18 25%,#2a2a28 50%,#1a1a18 75%); background-size:200% 100%; border-radius: 999px; }
+
+        /* Desktop (1024px and above) */
+        @media (min-width: 1024px) {
+          .hb-skel-flow { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+          .hb-skel-card { border-radius: 14px; }
+          .skill-chip-skel { padding: 12px 16px; min-width: 120px; }
+        }
+
+        /* Tablet (768px - 1023px) */
+        @media (max-width: 1023px) and (min-width: 768px) {
+          .hb-skel-flow { grid-template-columns: 1fr; gap: 14px; width: 100%; max-width: 100%; }
+          .hb-skel-card-wrap { width: 100%; max-width: 100%; }
+          .hb-skel-card-wrap.hb-skel-pos-1,
+          .hb-skel-card-wrap.hb-skel-pos-2 { transform: scale(1); opacity: 1; }
+          .hb-skel-card { border-radius: 12px; }
+          .skill-chip-skel { padding: 10px 12px; min-width: 100px; gap: 8px; }
+          .hb-body { padding: 16px 16px !important; }
+        }
+
+        /* Mobile (600px - 767px) */
+        @media (max-width: 767px) and (min-width: 600px) {
+          .hb-skel-flow { grid-template-columns: 1fr; gap: 14px; }
+          .hb-skel-card-wrap { width: 100%; }
+          .hb-skel-card-wrap.hb-skel-pos-0,
+          .hb-skel-card-wrap.hb-skel-pos-1,
+          .hb-skel-card-wrap.hb-skel-pos-2 { transform: none; opacity: 1; }
+          .hb-skel-card { border-radius: 12px; }
+          .hb-skel-tag-row { gap: 6px; }
+          .hb-skel-footer { gap: 10px; margin-top: 6px; }
+          .skill-chip-skel { padding: 9px 12px; min-width: 90px; gap: 8px; }
+          .skill-icon-skel { width: 18px; height: 18px; }
+          .skill-name-skel { height: 9px; min-width: 40px; }
+        }
+
+        /* Small Mobile (< 600px) */
+        @media (max-width: 599px) {
+          .hb-skel-flow { grid-template-columns: 1fr; gap: 12px; }
+          .hb-skel-card-wrap { width: 100%; }
+          .hb-skel-card-wrap.hb-skel-pos-0,
+          .hb-skel-card-wrap.hb-skel-pos-1,
+          .hb-skel-card-wrap.hb-skel-pos-2 { transform: none; opacity: 1; }
+          .hb-skel-card { border-radius: 10px; }
+          .hb-body { gap: 8px !important; padding: 14px 14px !important; }
+          .hb-skel-bar { border-radius: 3px; }
+          .hb-skel-tag-row { gap: 5px; }
+          .hb-skel-footer { gap: 8px; margin-top: 4px; }
+          .skill-chip-skel { padding: 7px 10px; min-width: 80px; gap: 6px; border-radius: 10px; }
+          .skill-icon-skel { width: 16px; height: 16px; border-radius: 6px; }
+          .skill-name-skel { height: 8px; min-width: 35px; }
+        }
+
+        @media (max-width: 900px) {
+          .hb-skel-flow { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+          .hb-skel-card-wrap.hb-skel-pos-1,
+          .hb-skel-card-wrap.hb-skel-pos-2 { transform: scale(0.98); opacity: 0.96; }
+        }
+        @media (max-width: 650px) {
+          .hb-skel-flow { grid-template-columns: 1fr; }
+          .hb-skel-card-wrap { width: 100%; }
+          .hb-skel-card-wrap.hb-skel-pos-1,
+          .hb-skel-card-wrap.hb-skel-pos-2 { transform: none; opacity: 1; }
+          .hb-skel-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+          .hb-skel-tag-row { gap: 6px; }
+          .skill-chip-skel { min-width: 0; width: 100%; justify-content: flex-start; }
         }
 
         /* Very small screens — only shrink layout, never text */
@@ -574,7 +699,11 @@ export default function HomeHero() {
             </div>
           </div>
 
-          {blogs.length === 0 ? (
+          {blogsLoading ? (
+            <div className="blog-loading-container">
+              <div className="blog-loading-spinner" />
+            </div>
+          ) : blogs.length === 0 ? (
             <p className="blog-empty">No published blogs yet.</p>
           ) : (
             <div className="blog-coverflow">
@@ -641,7 +770,7 @@ export default function HomeHero() {
           )}
         </div>
 
-        {skills.length > 0 && (
+        {(skills.length > 0 || skillsLoading) && (
           <>
             <div className="home-divider" />
 
@@ -652,7 +781,14 @@ export default function HomeHero() {
               </div>
 
               <div className="skill-rows">
-                {skillLanes.map((laneSkills, laneIdx) => (
+                {skillsLoading ? (
+                  <>
+                    <SkillsRowSkeleton />
+                    <SkillsRowSkeleton />
+                    <SkillsRowSkeleton />
+                  </>
+                ) : (
+                  skillLanes.map((laneSkills, laneIdx) => (
                   <div key={`lane-${laneIdx}`} className="skill-lane-card">
                     <div
                       className={`skill-lane-track ${laneIdx % 2 === 0 ? "track-left" : "track-right"}`}
@@ -678,7 +814,8 @@ export default function HomeHero() {
                       ))}
                     </div>
                   </div>
-                ))}
+                ))
+                )}
               </div>
             </div>
           </>

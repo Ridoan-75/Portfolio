@@ -216,22 +216,22 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 function CardSkeleton() {
   return (
     <div style={{
-      background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
-      borderRadius: "6px", overflow: "hidden",
+      background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
+      borderRadius: "6px", overflow: "hidden", display: "flex", flexDirection: "column",
     }}>
       <div className="proj-img-wrap proj-skel" />
-      <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
-        <div className="proj-skel" style={{ width: "60%", height: 20, borderRadius: 3 }} />
-        <div className="proj-skel" style={{ width: "90%", height: 11, borderRadius: 3 }} />
-        <div className="proj-skel" style={{ width: "75%", height: 11, borderRadius: 3 }} />
-        <div style={{ display: "flex", gap: 5, marginTop: 4 }}>
-          {[50, 65, 45, 55].map(w => (
-            <div key={w} className="proj-skel" style={{ width: w, height: 20, borderRadius: 2 }} />
+      <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 11, flex: 1 }}>
+        <div className="proj-skel" style={{ width: "55%", height: 18, borderRadius: 4 }} />
+        <div className="proj-skel" style={{ width: "100%", height: 13, borderRadius: 3 }} />
+        <div className="proj-skel" style={{ width: "85%", height: 13, borderRadius: 3 }} />
+        <div style={{ display: "flex", gap: 6, marginTop: 4, flexWrap: "wrap" }}>
+          {[55, 70, 50, 60].map((w, i) => (
+            <div key={i} className="proj-skel" style={{ width: w, height: 22, borderRadius: 4 }} />
           ))}
         </div>
-        <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-          <div className="proj-skel" style={{ width: 90, height: 32, borderRadius: 3 }} />
-          <div className="proj-skel" style={{ width: 80, height: 32, borderRadius: 3 }} />
+        <div style={{ display: "flex", gap: 9, marginTop: 6 }}>
+          <div className="proj-skel" style={{ width: 100, height: 36, borderRadius: 6, flex: 1 }} />
+          <div className="proj-skel" style={{ width: 100, height: 36, borderRadius: 6, flex: 1 }} />
         </div>
       </div>
     </div>
@@ -299,13 +299,12 @@ function GithubCTA() {
       className="proj-github-cta" style={{ opacity: 0 }}
       onMouseEnter={e => {
         const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = "rgba(var(--accent-rgb),0.3)";
-        el.style.color = "var(--accent)"; el.style.background = "rgba(var(--accent-rgb),0.04)";
-        gsap.to(el, { y: -3, scale: 1.03, duration: 0.25, ease: "power2.out" });
+        el.style.background = "rgba(var(--accent-rgb),0.16)";
+        gsap.to(el, { y: -3, scale: 1.05, duration: 0.25, ease: "power2.out" });
       }}
       onMouseLeave={e => {
         const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = "#1e1e1a"; el.style.color = "#9a9a90"; el.style.background = "transparent";
+        el.style.background = "rgba(var(--accent-rgb),0.1)";
         gsap.to(el, { y: 0, scale: 1, duration: 0.4, ease: "elastic.out(1,0.5)" });
       }}
     >
@@ -317,14 +316,29 @@ function GithubCTA() {
   );
 }
 
+// ── Search Icon ───────────────────────────────────────────────────────────────
+function SearchIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function Projects() {
   const [allProjects, setAllProjects]   = useState<Project[]>([]);
   const [loading, setLoading]           = useState(true);
   const [activeFilter, setActiveFilter] = useState<"all" | "featured">("all");
+  const [inputValue, setInput]          = useState("");
+  const [searchQuery, setQuery]         = useState("");
   const [page, setPage]                 = useState(1);
+  const [stuck, setStuck]               = useState(false);
   const headingRef = useRef<HTMLDivElement>(null);
   const gridRef    = useRef<HTMLDivElement>(null);
+  const inputRef   = useRef<HTMLInputElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/project")
@@ -333,7 +347,16 @@ export default function Projects() {
       .catch(() => setLoading(false));
   }, []);
 
-  const filtered    = activeFilter === "featured" ? allProjects.filter(p => p.featured) : allProjects;
+  const q = searchQuery.trim().toLowerCase();
+  let filtered = activeFilter === "featured" ? allProjects.filter(p => p.featured) : allProjects;
+  if (q) {
+    filtered = filtered.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q) ||
+      (p.category ?? "").toLowerCase().includes(q) ||
+      p.tags.some(t => t.toLowerCase().includes(q))
+    );
+  }
   const totalPages  = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated   = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
@@ -358,6 +381,24 @@ export default function Projects() {
       }, 50);
     });
   }, [animateGrid]);
+
+  // JS-based sticky for search bar — position: sticky breaks inside page-card { overflow: hidden }
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (window.innerWidth <= 1024) setStuck(!entry.isIntersecting);
+      },
+      { rootMargin: "-62px 0px 0px 0px", threshold: 0 }
+    );
+    observer.observe(sentinel);
+
+    const onResize = () => { if (window.innerWidth > 1024) setStuck(false); };
+    window.addEventListener("resize", onResize);
+    return () => { observer.disconnect(); window.removeEventListener("resize", onResize); };
+  }, []);
 
   // heading entrance
   useEffect(() => {
@@ -400,6 +441,18 @@ export default function Projects() {
     return () => ctx.revert();
   }, []);
 
+  const commitSearch = (val: string) => {
+    setQuery(val);
+    setPage(1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter")  { e.preventDefault(); commitSearch(inputValue); }
+    if (e.key === "Escape") { setInput(""); commitSearch(""); }
+  };
+
+  const handleClear = () => { setInput(""); commitSearch(""); inputRef.current?.focus(); };
+
   return (
     <>
       <style>{`
@@ -426,6 +479,65 @@ export default function Projects() {
         .proj-role-line::before { content:''; width:28px; height:1px; background:var(--accent); flex-shrink:0; }
         .proj-desc { font-size:16px; line-height:1.85; color:#c0bcb4; max-width:440px; margin-bottom:36px; opacity:0; }
 
+        /* search bar */
+        .proj-search-wrap { margin-bottom:12px; }
+        .proj-search-bar {
+          display:flex; align-items:center; gap:10px;
+          background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);
+          border-radius:8px; padding:11px 16px;
+          transition:border-color 0.2s, box-shadow 0.2s;
+        }
+        @keyframes projSearchDrop {
+          from { transform:translateY(-100%); opacity:0; }
+          to   { transform:translateY(0);     opacity:1; }
+        }
+        .proj-search-fixed {
+          position:fixed; top:62px; left:0; right:0; z-index:900;
+          background:rgba(8,8,8,0.97);
+          backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+          border-bottom:1px solid rgba(255,255,255,0.07);
+          padding:10px 20px;
+          animation:projSearchDrop 0.22s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+        .proj-search-fixed .proj-search-bar {
+          max-width:1100px; margin:0 auto;
+          background:rgba(255,255,255,0.05);
+        }
+        .proj-search-spacer { height:57px; margin-bottom:12px; }
+        .proj-search-bar:focus-within {
+          border-color:rgba(var(--accent-rgb),0.45);
+          box-shadow:0 0 0 3px rgba(var(--accent-rgb),0.08);
+        }
+        .proj-search-icon { color:#5a5a54; flex-shrink:0; display:flex; }
+        .proj-search-input {
+          flex:1; background:none; border:none; outline:none;
+          font-family:'JetBrains Mono',monospace; font-size:13px;
+          letter-spacing:0.04em; color:#e8e4dc; min-width:0;
+        }
+        .proj-search-input::placeholder { color:#666660; }
+        .proj-search-submit {
+          display:flex; align-items:center; justify-content:center;
+          width:30px; height:30px; border-radius:6px; flex-shrink:0;
+          background:rgba(var(--accent-rgb),0.12); border:1px solid rgba(var(--accent-rgb),0.3);
+          color:var(--accent); cursor:pointer;
+          transition:background 0.18s, transform 0.15s;
+        }
+        .proj-search-submit:hover { background:rgba(var(--accent-rgb),0.22); transform:scale(1.06); }
+        .proj-search-submit:active { transform:scale(0.95); }
+        .proj-search-clear {
+          background:none; border:none; cursor:pointer;
+          color:#5a5a54; font-size:20px; line-height:1;
+          padding:0 2px; transition:color 0.15s; flex-shrink:0;
+        }
+        .proj-search-clear:hover { color:var(--accent); }
+        .proj-search-count {
+          font-family:'JetBrains Mono',monospace; font-size:10px;
+          letter-spacing:0.06em; color:var(--accent); white-space:nowrap;
+          flex-shrink:0; background:rgba(var(--accent-rgb),0.1);
+          border:1px solid rgba(var(--accent-rgb),0.2); border-radius:4px;
+          padding:2px 8px;
+        }
+
         /* filters */
         .proj-filters-wrap { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:48px; opacity:0; }
         .proj-filter { padding:7px 16px; border-radius:3px; cursor:pointer; border:1px solid #1a1a18; background:transparent; color:#7a7a70; font-size:11px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; gap:6px; transition:color .2s,border-color .2s,background .2s; }
@@ -439,18 +551,18 @@ export default function Projects() {
 
         /* card body */
         .proj-card-body { padding:18px 20px; display:flex; flex-direction:column; flex:1; }
-        .proj-card-cat { display:inline-block; font-size:10px; font-family:'JetBrains Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); background:rgba(var(--accent-rgb),.12); border:1px solid rgba(var(--accent-rgb),.25); border-radius:3px; padding:3px 8px; margin-bottom:10px; font-weight:600; }
+        .proj-card-cat { display:inline-block; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); background:rgba(var(--accent-rgb),.22); border:1.5px solid rgba(var(--accent-rgb),.45); border-radius:5px; padding:6px 12px; margin-bottom:14px; font-weight:800; }
         .proj-card-title { font-family:'Bebas Neue',sans-serif; font-size:20px; font-weight:400; margin-bottom:8px; letter-spacing:.04em; transition:color .25s ease; line-height:1.2; }
         .proj-card-desc { font-size:13px; color:#9a9890; font-family:'DM Sans',sans-serif; line-height:1.75; margin-bottom:14px; flex:1; }
-        .proj-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
-        .proj-tag { padding:3px 8px; background:#0e0e0c; border:1px solid #2a2a25; border-radius:2px; font-size:9px; font-family:'JetBrains Mono',monospace; color:#7a7a70; letter-spacing:.06em; }
+        .proj-tags { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:16px; }
+        .proj-tag { padding:5px 11px; background:rgba(var(--accent-rgb),.08); border:1px solid rgba(var(--accent-rgb),.24); border-radius:4px; font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--accent); letter-spacing:.08em; font-weight:600; }
         .proj-card-btns { display:flex; gap:8px; flex-wrap:wrap; }
 
         /* buttons */
-        .proj-btn-primary { display:inline-flex; align-items:center; padding:8px 16px; border-radius:3px; font-size:11px; font-family:'JetBrains Mono',monospace; letter-spacing:.08em; text-decoration:none; cursor:pointer; text-transform:uppercase; background:rgba(var(--accent-rgb),.07); border:1px solid rgba(var(--accent-rgb),.22); color:var(--accent); transition:background .2s,border-color .2s; white-space:nowrap; }
-        .proj-btn-primary:hover { background:rgba(var(--accent-rgb),.14); }
-        .proj-btn-secondary { display:inline-flex; align-items:center; padding:8px 16px; border-radius:3px; font-size:11px; font-family:'JetBrains Mono',monospace; letter-spacing:.08em; text-decoration:none; cursor:pointer; text-transform:uppercase; background:transparent; border:1px solid #1e1e1a; color:#7a7a70; transition:border-color .2s,color .2s; white-space:nowrap; }
-        .proj-btn-secondary:hover { border-color:rgba(var(--accent-rgb),.22); color:var(--accent); }
+        .proj-btn-primary { display:inline-flex; align-items:center; padding:10px 18px; border-radius:6px; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-decoration:none; cursor:pointer; text-transform:uppercase; background:rgba(var(--accent-rgb),.14); border:1px solid rgba(var(--accent-rgb),.35); color:var(--accent); transition:background .2s,border-color .2s,box-shadow .2s; white-space:nowrap; font-weight:600; }
+        .proj-btn-primary:hover { background:rgba(var(--accent-rgb),.22); border-color:rgba(var(--accent-rgb),.5); box-shadow:0 4px 12px rgba(var(--accent-rgb),.1); }
+        .proj-btn-secondary { display:inline-flex; align-items:center; padding:10px 18px; border-radius:6px; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-decoration:none; cursor:pointer; text-transform:uppercase; background:rgba(var(--accent-rgb),.08); border:1px solid rgba(var(--accent-rgb),.25); color:var(--accent); transition:background .2s,border-color .2s,box-shadow .2s; white-space:nowrap; font-weight:600; }
+        .proj-btn-secondary:hover { background:rgba(var(--accent-rgb),.14); border-color:rgba(var(--accent-rgb),.4); box-shadow:0 4px 12px rgba(var(--accent-rgb),.08); }
 
         /* grid — auto columns: fills with min 280px, no fixed column count */
         .proj-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
@@ -467,7 +579,7 @@ export default function Projects() {
 
         /* skeleton */
         @keyframes projSkelShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-        .proj-skel { background:linear-gradient(90deg,#181816 25%,#222220 50%,#181816 75%); background-size:200% 100%; animation:projSkelShimmer 1.6s ease infinite; }
+        .proj-skel { background:linear-gradient(90deg,#1a1a18 25%,#2a2a28 50%,#1a1a18 75%); background-size:200% 100%; animation:projSkelShimmer 1.4s ease infinite; border-radius:4px; }
 
         /* stats */
         .proj-stats { display:flex; align-items:stretch; margin-top:52px; background:linear-gradient(145deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.014) 100%); border:1px solid rgba(255,255,255,.08); box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 4px 20px rgba(0,0,0,.28); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:6px; overflow:hidden; width:fit-content; opacity:0; }
@@ -477,7 +589,7 @@ export default function Projects() {
         .proj-stat-label { font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:#7a7670; margin-top:4px; }
 
         /* github cta */
-        .proj-github-cta { display:inline-flex; align-items:center; gap:10px; padding:14px 28px; border-radius:3px; background:transparent; border:1px solid #1e1e1a; color:#9a9a90; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; transition:all .25s; }
+        .proj-github-cta { display:inline-flex; align-items:center; gap:12px; padding:18px 40px; border-radius:10px; background:rgba(var(--accent-rgb),0.1); border:2px solid rgba(var(--accent-rgb),0.5); color:var(--accent); font-size:14px; font-family:'JetBrains Mono',monospace; letter-spacing:.14em; text-decoration:none; text-transform:uppercase; transition:all .25s; font-weight:700; }
 
         /* empty */
         .proj-empty { text-align:center; padding:80px 20px; }
@@ -565,6 +677,51 @@ export default function Projects() {
                 A curated collection of work — from SaaS platforms to creative landing pages, all built with care and shipped to production.
               </p>
 
+              {/* Sentinel — IntersectionObserver watches this to detect when search bar scrolls past nav */}
+              <div ref={sentinelRef} style={{ height: 0 }} />
+
+              {/* Spacer replaces the search bar's space when it goes fixed */}
+              {stuck && <div className="proj-search-spacer" />}
+
+              {/* Search bar — rendered inline normally, teleported to fixed when stuck */}
+              {!loading && (
+                <div className={stuck ? "proj-search-fixed" : "proj-search-wrap"}>
+                  <div className="proj-search-bar">
+                    <span className="proj-search-icon"><SearchIcon /></span>
+                    <input
+                      ref={inputRef}
+                      className="proj-search-input"
+                      type="text"
+                      placeholder="Search projects by title, tag or category..."
+                      value={inputValue}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      autoComplete="off"
+                      spellCheck={false}
+                    />
+                    {searchQuery && (
+                      <span className="proj-search-count">
+                        {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+                      </span>
+                    )}
+                    {inputValue && (
+                      <button className="proj-search-clear" onClick={handleClear} aria-label="Clear">×</button>
+                    )}
+                    <button
+                      className="proj-search-submit"
+                      onClick={() => commitSearch(inputValue)}
+                      aria-label="Search"
+                      title="Search"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* filters */}
               {!loading && (
                 <div className="proj-filters-wrap">
@@ -583,8 +740,15 @@ export default function Projects() {
                 : paginated.length === 0
                 ? (
                   <div className="proj-empty" style={{ gridColumn: "1/-1" }}>
-                    <div className="proj-empty-title">No Projects Yet</div>
-                    <div className="proj-empty-sub">{"// Add projects from the admin panel"}</div>
+                    <div className="proj-empty-title">
+                      {searchQuery ? "No Results Found" : "No Projects Yet"}
+                    </div>
+                    <div className="proj-empty-sub">
+                      {searchQuery
+                        ? <>nothing matched &ldquo;<span style={{ color: "var(--accent)" }}>{searchQuery}</span>&rdquo;</>
+                        : "// Add projects from the admin panel"
+                      }
+                    </div>
                   </div>
                 )
                 : paginated.map((project, i) => (

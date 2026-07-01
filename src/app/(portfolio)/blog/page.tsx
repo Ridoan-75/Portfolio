@@ -164,7 +164,7 @@ export default function BlogPage() {
   const [inputValue, setInput]  = useState("");   // what's typed
   const [searchQuery, setQuery] = useState("");   // what's filtering (set on Enter)
   const [page, setPage]         = useState(1);
-  const [stuck, setStuck]       = useState(false);
+  const [navStuck, setStuck]    = useState(false); // fixed search bar on mobile when scrolling
 
   const headingRef  = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -188,7 +188,7 @@ export default function BlogPage() {
     return () => ctx.revert();
   }, []);
 
-  // JS-based sticky — position: sticky breaks inside page-card { overflow: hidden }
+  // IntersectionObserver for sticky search bar — only fixes on mobile when scrolling
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
@@ -197,13 +197,10 @@ export default function BlogPage() {
       ([entry]) => {
         if (window.innerWidth <= 1024) setStuck(!entry.isIntersecting);
       },
-      { rootMargin: "-62px 0px 0px 0px", threshold: 0 }
+      { threshold: 0 }
     );
     observer.observe(sentinel);
-
-    const onResize = () => { if (window.innerWidth > 1024) setStuck(false); };
-    window.addEventListener("resize", onResize);
-    return () => { observer.disconnect(); window.removeEventListener("resize", onResize); };
+    return () => observer.disconnect();
   }, []);
 
   const q        = searchQuery.trim().toLowerCase();
@@ -338,7 +335,7 @@ export default function BlogPage() {
           to   { transform:translateY(0);     opacity:1; }
         }
         .bl-search-fixed {
-          position:fixed; top:62px; left:0; right:0; z-index:900;
+          position:fixed; top:62px; left:0; right:0; z-index:1110;
           background:rgba(8,8,8,0.97);
           backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
           border-bottom:1px solid rgba(255,255,255,0.07);
@@ -349,7 +346,7 @@ export default function BlogPage() {
           max-width:1100px; margin:0 auto;
           background:rgba(255,255,255,0.05);
         }
-        .bl-search-spacer { height:57px; margin-bottom:36px; }
+        .bl-search-spacer { height:62px; margin-bottom:36px; }
 
         /* Grid */
         .bl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
@@ -431,10 +428,10 @@ export default function BlogPage() {
             <div ref={sentinelRef} style={{ height: 0 }} />
 
             {/* Spacer replaces the search bar's space when it goes fixed */}
-            {stuck && <div className="bl-search-spacer" />}
+            {navStuck && <div className="bl-search-spacer" />}
 
-            {/* Search bar — rendered inline normally, teleported to fixed when stuck */}
-            <div className={stuck ? "bl-search-fixed" : "bl-search-wrap"}>
+            {/* Search bar — fixed on mobile when scrolling, inline otherwise */}
+            <div className={navStuck ? "bl-search-fixed" : "bl-search-wrap"}>
               {SearchBar}
             </div>
 

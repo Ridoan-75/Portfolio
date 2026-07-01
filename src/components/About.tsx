@@ -187,31 +187,69 @@ export default function About() {
       // ── INTRO ──
       case "intro":
         return (
-          <div className="ab-intro-grid">
-            <div className="ab-intro-card ab-card">
-              <div className="ab-intro-label">{"// About me"}</div>
-              <p className="ab-intro-text">
-                I&apos;m Md Ridoan Hossen, a Full Stack Developer based in Chattogram, Bangladesh. I specialize in building modern web applications using React, Next.js, Node.js, and various databases.
+          <div>
+            <div className="ab-resume-section ab-card">
+              <div className="ab-intro-label">{"// Resume & CV"}</div>
+              <p className="ab-intro-text" style={{ marginBottom: 16 }}>
+                Download my complete resume to explore a detailed breakdown of my technical skills, professional achievements, and project portfolio. It includes real-world examples of web apps, API integrations, and performance-focused solutions.
               </p>
-              <p className="ab-intro-text" style={{ marginTop: 14 }}>
-                I&apos;m passionate about clean code, great UX, and learning new technologies. Outside of coding I enjoy exploring new frameworks, contributing to open source, and sharing knowledge with the community.
-              </p>
+              <div className="ab-resume-actions">
+                <button
+                  className="ab-resume-btn ab-resume-btn-preview"
+                  onClick={() => window.open("/resume.pdf", "_blank")}
+                  title="View resume in new tab"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  Preview
+                </button>
+                <a
+                  href="/resume.pdf"
+                  download="Md_Ridoan_Hossen_Resume.pdf"
+                  className="ab-resume-btn ab-resume-btn-download"
+                  title="Download resume as PDF"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Download
+                </a>
+              </div>
             </div>
-            <div className="ab-intro-card ab-card">
-              <div className="ab-intro-label">{"// Quick info"}</div>
-              {[
-                { key: "Name",         val: "Md Ridoan Hossen" },
-                { key: "Location",     val: "Chattogram, Bangladesh" },
-                { key: "Role",         val: "Full Stack Developer" },
-                { key: "Experience",   val: "2+ Years" },
-                { key: "Availability", val: "Open to Work" },
-                { key: "GitHub",       val: "@Ridoan-75" },
-              ].map(({ key, val }) => (
-                <div key={key} className="ab-info-row">
-                  <span className="ab-info-key">{key}</span>
-                  <span className="ab-info-val">{val}</span>
-                </div>
-              ))}
+
+            <div className="ab-intro-grid">
+              <div className="ab-intro-card ab-card">
+                <div className="ab-intro-label">{"// About me"}</div>
+                <p className="ab-intro-text">
+                  I&apos;m Md Ridoan Hossen, a Full Stack Developer based in Chattogram, Bangladesh. I specialize in building modern web applications using React, Next.js, Node.js, and database technologies that power smooth, scalable interfaces.
+                </p>
+                <p className="ab-intro-text" style={{ marginTop: 14 }}>
+                  Over the past few years I&apos;ve delivered projects across e-commerce, SaaS, and productivity tools. I enjoy designing clean architectures, solving complex problems, and turning product ideas into polished user experiences.
+                </p>
+                <p className="ab-intro-text" style={{ marginTop: 14 }}>
+                  When I&apos;m not writing code I&apos;m learning new frameworks, reviewing technical articles, or helping others grow through open source contributions and mentorship.
+                </p>
+              </div>
+              <div className="ab-intro-card ab-card">
+                <div className="ab-intro-label">{"// Quick info"}</div>
+                {[
+                  { key: "Name",         val: "Md Ridoan Hossen" },
+                  { key: "Location",     val: "Chattogram, Bangladesh" },
+                  { key: "Role",         val: "Full Stack Developer" },
+                  { key: "Experience",   val: "2+ Years" },
+                  { key: "Availability", val: "Open to Work" },
+                  { key: "GitHub",       val: "@Ridoan-75" },
+                ].map(({ key, val }) => (
+                  <div key={key} className="ab-info-row">
+                    <span className="ab-info-key">{key}</span>
+                    <span className="ab-info-val">{val}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         );
@@ -331,6 +369,7 @@ export default function About() {
           margin: 0 -40px 0;
           padding: 0 40px;
         }
+
         .ab-nav-inner {
           max-width: 1100px; margin: 0 auto;
           display: flex; align-items: stretch;
@@ -387,7 +426,7 @@ export default function About() {
         }
 
         /* ── Content wrapper ── */
-        .ab-content { padding-top: 36px; min-height: 340px; }
+        .ab-content { padding-top: 36px; min-height: 600px; }
 
         /* ── Section title ── */
         .ab-sec-title {
@@ -398,21 +437,51 @@ export default function About() {
         .ab-sec-title::before { content:''; width:3px; height:22px; background:var(--accent); border-radius:2px; flex-shrink:0; }
 
         /* ── Intro grid ── */
-        .ab-intro-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:stretch; }
+        .ab-intro-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:stretch; margin-top:20px; }
         .ab-intro-card {
           background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
           border-radius:14px; padding:24px;
           backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
           box-shadow:inset 0 1px 0 rgba(255,255,255,0.07); opacity:0;
-          height:100%; box-sizing:border-box;
+          height:100%; min-height:320px; box-sizing:border-box;
           display:flex; flex-direction:column;
         }
-        .ab-intro-label { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:rgba(var(--accent-rgb),.6); margin-bottom:12px; }
-        .ab-intro-text { font-size:14px; line-height:1.9; color:#c8c4bc; margin:0; }
-        .ab-info-row { display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+        .ab-intro-label { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; font-weight:600; }
+        .ab-intro-text { font-size:15px; line-height:2; color:#d8d4cc; margin:0; font-weight:500; }
+        .ab-resume-section {
+          background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+          border-radius:14px; padding:24px; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+          box-shadow:inset 0 1px 0 rgba(255,255,255,0.07); opacity:0;
+          display:flex; flex-direction:column; gap:12px;
+        }
+        .ab-resume-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:auto; }
+        .ab-resume-btn {
+          flex:1; min-width:120px; padding:10px 14px; border-radius:8px;
+          display:flex; align-items:center; justify-content:center; gap:6px;
+          font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+          border:none; cursor:pointer; transition:all .22s ease; text-decoration:none;
+          font-weight:500;
+        }
+        .ab-resume-btn-preview {
+          background:rgba(var(--accent-rgb),.08); border:1px solid rgba(var(--accent-rgb),.22);
+          color:var(--accent);
+        }
+        .ab-resume-btn-preview:hover {
+          background:rgba(var(--accent-rgb),.16); border-color:rgba(var(--accent-rgb),.4);
+          transform:translateY(-2px);
+        }
+        .ab-resume-btn-download {
+          background:var(--accent); border:none;
+          color:#080808;
+        }
+        .ab-resume-btn-download:hover {
+          filter:brightness(1.12); transform:translateY(-2px);
+          box-shadow:0 6px 20px rgba(0,0,0,.3);
+        }
+        .ab-info-row { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,0.08); }
         .ab-info-row:last-child { border-bottom:none; }
-        .ab-info-key { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#888070; width:110px; flex-shrink:0; }
-        .ab-info-val { font-family:'DM Sans',sans-serif; font-size:13px; color:#c8c4bc; }
+        .ab-info-key { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#a0a898; width:110px; flex-shrink:0; font-weight:600; }
+        .ab-info-val { font-family:'DM Sans',sans-serif; font-size:14px; color:#e8e4dc; font-weight:500; }
 
         /* ── Timeline cards ── */
         .ab-card {

@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function ScrollToTop() {
   const [visible, setVisible] = useState(false);
-  const [hovered, setHovered] = useState(false);
   const [scrollPercent, setScrollPercent] = useState(0);
   const isScrolling = useRef(false);
 
@@ -78,23 +77,6 @@ export default function ScrollToTop() {
           transform: rotate(-90deg); z-index: 1;
         }
 
-        .stt-label {
-          position: absolute; bottom: calc(100% + 10px); right: 0;
-          font-family: 'JetBrains Mono', monospace; font-size: 9px;
-          letter-spacing: .12em; text-transform: uppercase;
-          color: var(--accent); background: #0e0e0c;
-          border: 1px solid rgba(var(--accent-rgb),.15);
-          border-radius: 3px; padding: 5px 10px;
-          white-space: nowrap; pointer-events: none;
-        }
-
-        .stt-label::after {
-          content: ''; position: absolute; bottom: -4px; right: 18px;
-          width: 7px; height: 7px; background: #0e0e0c;
-          border-right: 1px solid rgba(var(--accent-rgb),.15);
-          border-bottom: 1px solid rgba(var(--accent-rgb),.15);
-          transform: rotate(45deg);
-        }
 
         @media (max-width: 768px) {
           .stt-btn { bottom: 24px; right: 24px; }
@@ -118,8 +100,6 @@ export default function ScrollToTop() {
           <motion.button
             className="stt-btn"
             onClick={scrollTop}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
             initial={{ opacity: 0, scale: 0, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0, y: 20 }}
@@ -137,23 +117,8 @@ export default function ScrollToTop() {
             </svg>
 
             <div className="stt-inner">
-              <motion.div
-                animate={hovered ? { y: [0, -3, 0] } : { y: 0 }}
-                transition={hovered ? { duration: 0.6, repeat: Infinity, ease: "easeInOut" } : {}}
-              >
-                <ArrowUp size={16} strokeWidth={2.5} />
-              </motion.div>
+              <ArrowUp size={16} strokeWidth={2.5} />
             </div>
-
-            <AnimatePresence>
-              {hovered && (
-                <motion.div className="stt-label"
-                  initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 5 }} transition={{ duration: 0.2 }}>
-                  Back to Top
-                </motion.div>
-              )}
-            </AnimatePresence>
           </motion.button>
         )}
       </AnimatePresence>

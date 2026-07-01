@@ -131,18 +131,28 @@ export default function PageLoader() {
         ease: "power2.inOut",
         delay: 0.35,
         onComplete: () => {
-          gsap.fromTo(".ld-ridoan-svg",
-            { filter: `drop-shadow(0 0 0px transparent)` },
-            {
-              filter: `drop-shadow(0 0 20px ${accent}aa)`,
-              duration: 0.35, ease: "power2.out",
-              onComplete: () =>
-                gsap.to(".ld-ridoan-svg", {
-                  filter: `drop-shadow(0 0 8px ${accent}44)`,
-                  duration: 0.8, ease: "power2.inOut",
-                }),
+          // blink animation after drawing completes
+          gsap.to(".ld-ridoan-svg", {
+            opacity: 0.4,
+            duration: 0.15,
+            yoyo: true,
+            repeat: 3,
+            ease: "power1.inOut",
+            onComplete: () => {
+              gsap.fromTo(".ld-ridoan-svg",
+                { filter: `drop-shadow(0 0 0px transparent)` },
+                {
+                  filter: `drop-shadow(0 0 20px ${accent}aa)`,
+                  duration: 0.35, ease: "power2.out",
+                  onComplete: () =>
+                    gsap.to(".ld-ridoan-svg", {
+                      filter: `drop-shadow(0 0 8px ${accent}44)`,
+                      duration: 0.8, ease: "power2.inOut",
+                    }),
+                }
+              );
             }
-          );
+          });
         },
       });
 
