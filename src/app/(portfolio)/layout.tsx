@@ -55,6 +55,7 @@ export default function PortfolioLayout({
                   flexDirection: "column",
                   minHeight: "100vh",
                   padding: "0 0 0 28px",
+                  minWidth: 0,
                 }}
               >
                 {children}

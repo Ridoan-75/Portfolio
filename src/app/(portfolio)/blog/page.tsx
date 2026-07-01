@@ -32,7 +32,16 @@ function EyeIcon({ size = 13 }: { size?: number }) {
   );
 }
 
-// ── Blog Card (project-card style) ────────────────────────────────────────────
+function SearchIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  );
+}
+
+// ── Blog Card ─────────────────────────────────────────────────────────────────
 function BlogCard({ blog, index, onNavigate }: { blog: Blog; index: number; onNavigate: (id: string) => void }) {
   const cardRef    = useRef<HTMLDivElement>(null);
   const glowRef    = useRef<HTMLDivElement>(null);
@@ -40,9 +49,7 @@ function BlogCard({ blog, index, onNavigate }: { blog: Blog; index: number; onNa
   const isTouchRef = useRef(false);
   const [hovered, setHovered] = useState(false);
 
-  useEffect(() => {
-    isTouchRef.current = window.matchMedia("(hover: none)").matches;
-  }, []);
+  useEffect(() => { isTouchRef.current = window.matchMedia("(hover: none)").matches; }, []);
 
   useEffect(() => {
     if (!cardRef.current) return;
@@ -60,139 +67,63 @@ function BlogCard({ blog, index, onNavigate }: { blog: Blog; index: number; onNa
     const rect = el.getBoundingClientRect();
     const x = e.clientX - rect.left, y = e.clientY - rect.top;
     const cx = rect.width / 2, cy = rect.height / 2;
-    gsap.to(el, { rotateX: ((y - cy) / cy) * -5, rotateY: ((x - cx) / cx) * 5,
-      duration: 0.3, ease: "power2.out", transformPerspective: 900 });
-    if (glowRef.current)
-      gsap.to(glowRef.current, { x: x - 150, y: y - 150, duration: 0.4, ease: "power2.out" });
+    gsap.to(el, { rotateX: ((y - cy) / cy) * -5, rotateY: ((x - cx) / cx) * 5, duration: 0.3, ease: "power2.out", transformPerspective: 900 });
+    if (glowRef.current) gsap.to(glowRef.current, { x: x - 150, y: y - 150, duration: 0.4, ease: "power2.out" });
   }, []);
 
   const handleMouseEnter = useCallback(() => {
     setHovered(true);
-    gsap.to(cardRef.current, {
-      borderColor: "rgba(var(--accent-rgb),0.35)",
-      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14),inset 0 -1px 0 rgba(0,0,0,0.15),0 8px 40px rgba(0,0,0,0.38),0 0 32px rgba(var(--accent-rgb),0.12)",
-      duration: 0.3,
-    });
+    gsap.to(cardRef.current, { borderColor: "rgba(var(--accent-rgb),0.35)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1),0 8px 40px rgba(0,0,0,0.5),0 0 32px rgba(var(--accent-rgb),0.1)", duration: 0.3 });
     gsap.to(accentRef.current, { opacity: 1, duration: 0.25 });
     gsap.to(glowRef.current,   { opacity: 1, duration: 0.3 });
   }, []);
 
   const handleMouseLeave = useCallback(() => {
     setHovered(false);
-    gsap.to(cardRef.current, {
-      rotateX: 0, rotateY: 0,
-      borderColor: "rgba(255,255,255,0.09)",
-      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.15),0 4px 24px rgba(0,0,0,0.32),0 1px 4px rgba(0,0,0,0.4)",
-      duration: 0.6, ease: "elastic.out(1,0.6)", transformPerspective: 900,
-    });
+    gsap.to(cardRef.current, { rotateX: 0, rotateY: 0, borderColor: "rgba(255,255,255,0.09)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06),0 4px 24px rgba(0,0,0,0.4),0 1px 4px rgba(0,0,0,0.5)", duration: 0.5, ease: "power3.out", transformPerspective: 900 });
     gsap.to(accentRef.current, { opacity: 0, duration: 0.3 });
     gsap.to(glowRef.current,   { opacity: 0, duration: 0.3 });
   }, []);
 
   const plainText = blog.content.replace(/<[^>]+>/g, "");
-  const dateStr = new Date(blog.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  const dateStr   = new Date(blog.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 
   return (
-    <div style={{ perspective: "900px", opacity: 0 }} ref={cardRef}>
+    <div style={{ opacity: 0 }} ref={cardRef}>
       <div
         onClick={() => onNavigate(blog.id)}
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         style={{
-          background: "linear-gradient(145deg,rgba(255,255,255,0.058) 0%,rgba(255,255,255,0.016) 100%)",
+          background: "linear-gradient(145deg,rgba(22,22,20,0.96) 0%,rgba(16,16,14,0.98) 100%)",
           border: "1px solid rgba(255,255,255,0.09)",
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.15),0 4px 24px rgba(0,0,0,0.32),0 1px 4px rgba(0,0,0,0.4)",
-          backdropFilter: "blur(14px) saturate(1.4)",
-          WebkitBackdropFilter: "blur(14px) saturate(1.4)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06),0 4px 24px rgba(0,0,0,0.4),0 1px 4px rgba(0,0,0,0.5)",
           borderRadius: "6px", overflow: "hidden", position: "relative",
-          willChange: "transform", height: "100%",
-          display: "flex", flexDirection: "column",
-          cursor: "pointer",
-          transition: "border-color .3s ease, box-shadow .35s ease",
+          height: "100%", display: "flex", flexDirection: "column",
+          cursor: "pointer", transition: "border-color .3s ease, box-shadow .35s ease",
         }}
       >
-        {/* top accent line */}
-        <div ref={accentRef} style={{
-          position: "absolute", top: 0, left: 0, right: 0, height: "3px",
-          background: "linear-gradient(90deg,var(--accent),transparent)",
-          boxShadow: "0 0 14px rgba(var(--accent-rgb),0.5)",
-          opacity: 0, zIndex: 3,
-        }} />
+        <div ref={accentRef} style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg,var(--accent),transparent)", boxShadow: "0 0 14px rgba(var(--accent-rgb),0.5)", opacity: 0, zIndex: 3 }} />
+        <div ref={glowRef} style={{ position: "absolute", width: "360px", height: "360px", borderRadius: "50%", background: "radial-gradient(circle,rgba(var(--accent-rgb),0.12) 0%,transparent 68%)", pointerEvents: "none", opacity: 0, zIndex: 1, transform: "translate(-50%,-50%)" }} />
 
-        {/* cursor glow */}
-        <div ref={glowRef} style={{
-          position: "absolute", width: "360px", height: "360px", borderRadius: "50%",
-          background: "radial-gradient(circle,rgba(var(--accent-rgb),0.12) 0%,transparent 68%)",
-          pointerEvents: "none", opacity: 0, zIndex: 1,
-          transform: "translate(-50%,-50%)",
-        }} />
-
-        {/* image area */}
         <div className="bl-img-wrap">
-          {/* grid pattern overlay */}
-          <div style={{
-            position: "absolute", inset: 0,
-            backgroundImage: "linear-gradient(rgba(var(--accent-rgb),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--accent-rgb),.04) 1px,transparent 1px)",
-            backgroundSize: "28px 28px", pointerEvents: "none", zIndex: 0,
-          }} />
-
-          {blog.thumbnail ? (
-            <img src={blog.thumbnail} alt={blog.title} className="bl-img" />
-          ) : (
-            <div className="bl-img-ph">
-              <span className="bl-img-ph-text">BLOG</span>
-            </div>
-          )}
-
-          {/* gradient overlay with title */}
-          <div className="bl-img-overlay">
-            <h3 className="bl-img-title">{blog.title}</h3>
-          </div>
-
-          {/* date badge */}
-          <div style={{
-            position: "absolute", top: "8px", right: "8px", zIndex: 2,
-            padding: "3px 9px",
-            background: "rgba(8,8,8,0.85)", border: "1px solid rgba(var(--accent-rgb),0.2)",
-            borderRadius: "3px", fontSize: "10px",
-            fontFamily: "'JetBrains Mono',monospace",
-            color: "var(--accent)", letterSpacing: "0.08em",
-          }}>{new Date(blog.createdAt).getFullYear()}</div>
-
-          {/* category badge */}
-          {blog.category && (
-            <div style={{
-              position: "absolute", top: "8px", left: "8px", zIndex: 2,
-              padding: "3px 8px",
-              background: "rgba(8,8,8,0.85)", border: "1px solid rgba(var(--accent-rgb),0.25)",
-              borderRadius: "3px", fontSize: "9px",
-              fontFamily: "'JetBrains Mono',monospace",
-              color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 600,
-            }}>{blog.category}</div>
-          )}
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(var(--accent-rgb),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--accent-rgb),.04) 1px,transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none", zIndex: 0 }} />
+          {blog.thumbnail ? <img src={blog.thumbnail} alt={blog.title} className="bl-img" /> : <div className="bl-img-ph"><span className="bl-img-ph-text">BLOG</span></div>}
+          <div className="bl-img-overlay" />
+          <div style={{ position: "absolute", top: "8px", right: "8px", zIndex: 2, padding: "3px 9px", background: "rgba(8,8,8,0.85)", border: "1px solid rgba(var(--accent-rgb),0.2)", borderRadius: "3px", fontSize: "10px", fontFamily: "'JetBrains Mono',monospace", color: "var(--accent)", letterSpacing: "0.08em" }}>{new Date(blog.createdAt).getFullYear()}</div>
+          {blog.category && <div style={{ position: "absolute", top: "8px", left: "8px", zIndex: 2, padding: "3px 8px", background: "rgba(8,8,8,0.85)", border: "1px solid rgba(var(--accent-rgb),0.25)", borderRadius: "3px", fontSize: "9px", fontFamily: "'JetBrains Mono',monospace", color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 600 }}>{blog.category}</div>}
         </div>
 
-        {/* card body */}
         <div className="bl-card-body">
-          <h2 className="bl-card-title" style={{ color: hovered ? "var(--accent)" : "#f0ece4" }}>
-            {blog.title}
-          </h2>
-
+          <h2 className="bl-card-title" style={{ color: hovered ? "var(--accent)" : "#f0ece4" }}>{blog.title}</h2>
           <div className="bl-card-meta-row">
             <span className="bl-card-date">{dateStr}</span>
-            <div className="bl-views-chip">
-              <EyeIcon size={12} />
-              <span>{blog.views ?? 0} views</span>
-            </div>
+            <div className="bl-views-chip"><EyeIcon size={12} /><span>{blog.views ?? 0} views</span></div>
           </div>
-
           <p className="bl-card-excerpt">{plainText}</p>
-
           <div className="bl-card-footer">
-            <span className="bl-read-link" onClick={(e) => { e.stopPropagation(); onNavigate(blog.id); }}>
-              Read Full Blog →
-            </span>
+            <span className="bl-read-link" onClick={(e) => { e.stopPropagation(); onNavigate(blog.id); }}>Read Full Blog →</span>
             <span className="bl-blog-badge">BLOG</span>
           </div>
         </div>
@@ -201,7 +132,6 @@ function BlogCard({ blog, index, onNavigate }: { blog: Blog; index: number; onNa
   );
 }
 
-// ── Skeleton ──────────────────────────────────────────────────────────────────
 function BlogCardSkeleton() {
   return (
     <div className="bl-skel-card">
@@ -216,11 +146,11 @@ function BlogCardSkeleton() {
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           <div className="bl-skel-bar" style={{ width: "100%", height: "12px" }} />
           <div className="bl-skel-bar" style={{ width: "100%", height: "12px" }} />
-          <div className="bl-skel-bar" style={{ width: "72%", height: "12px" }} />
+          <div className="bl-skel-bar" style={{ width: "72%",  height: "12px" }} />
         </div>
         <div className="bl-skel-footer-row">
           <div className="bl-skel-bar" style={{ width: "110px", height: "12px" }} />
-          <div className="bl-skel-bar" style={{ width: "48px", height: "22px", borderRadius: "3px" }} />
+          <div className="bl-skel-bar" style={{ width: "48px",  height: "22px", borderRadius: "3px" }} />
         </div>
       </div>
     </div>
@@ -229,12 +159,17 @@ function BlogCardSkeleton() {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function BlogPage() {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [blogs, setBlogs]       = useState<Blog[]>([]);
   const [fetching, setFetching] = useState(true);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [page, setPage] = useState(1);
-  const headingRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  const [inputValue, setInput]  = useState("");   // what's typed
+  const [searchQuery, setQuery] = useState("");   // what's filtering (set on Enter)
+  const [page, setPage]         = useState(1);
+  const [stuck, setStuck]       = useState(false);
+
+  const headingRef  = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const inputRef    = useRef<HTMLInputElement>(null);
+  const router      = useRouter();
 
   useEffect(() => {
     fetch("/api/blog")
@@ -246,29 +181,96 @@ export default function BlogPage() {
   useEffect(() => {
     if (!headingRef.current) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(".bl-status-tag", { y: 30, opacity: 0, scale: 0.9 }, {
-        y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.7)", delay: 0.1,
-        scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true },
-      });
-      gsap.fromTo(".bl-heading", { y: 60, opacity: 0, skewY: 3 }, {
-        y: 0, opacity: 1, skewY: 0, duration: 1, ease: "power4.out", delay: 0.25,
-        scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true },
-      });
-      gsap.fromTo(".bl-role-line", { y: 20, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 0.6, ease: "power3.out", delay: 0.45,
-        scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true },
-      });
+      gsap.fromTo(".bl-status-tag", { y: 30, opacity: 0, scale: 0.9 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.7)", delay: 0.1, scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true } });
+      gsap.fromTo(".bl-heading",    { y: 60, opacity: 0, skewY: 3 },   { y: 0, opacity: 1, skewY: 0, duration: 1, ease: "power4.out", delay: 0.25, scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true } });
+      gsap.fromTo(".bl-role-line",  { y: 20, opacity: 0 },             { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", delay: 0.45, scrollTrigger: { trigger: headingRef.current, start: "top 82%", once: true } });
     }, headingRef);
     return () => ctx.revert();
   }, []);
 
-  const categories = ["All", ...Array.from(new Set(blogs.map((b) => b.category).filter(Boolean) as string[]))];
-  const filtered = activeCategory === "All" ? blogs : blogs.filter((b) => b.category === activeCategory);
-  const totalPages = Math.ceil(filtered.length / POSTS_PER_PAGE);
-  const paginated = filtered.slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE);
+  // JS-based sticky — position: sticky breaks inside page-card { overflow: hidden }
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
 
-  const handleCategoryChange = (cat: string) => { setActiveCategory(cat); setPage(1); };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (window.innerWidth <= 1024) setStuck(!entry.isIntersecting);
+      },
+      { rootMargin: "-62px 0px 0px 0px", threshold: 0 }
+    );
+    observer.observe(sentinel);
+
+    const onResize = () => { if (window.innerWidth > 1024) setStuck(false); };
+    window.addEventListener("resize", onResize);
+    return () => { observer.disconnect(); window.removeEventListener("resize", onResize); };
+  }, []);
+
+  const q        = searchQuery.trim().toLowerCase();
+  const filtered = q
+    ? blogs.filter((b) =>
+        b.title.toLowerCase().includes(q) ||
+        b.content.replace(/<[^>]+>/g, "").toLowerCase().includes(q) ||
+        (b.category ?? "").toLowerCase().includes(q) ||
+        b.tags.some((t) => t.toLowerCase().includes(q))
+      )
+    : blogs;
+
+  const totalPages = Math.ceil(filtered.length / POSTS_PER_PAGE);
+  const paginated  = filtered.slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE);
+
+  const commitSearch = (val: string) => {
+    setQuery(val);
+    setPage(1);
+    // Scroll to top so results are visible from the start and sentinel re-enters
+    // the viewport, which naturally releases the fixed state cleanly
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter")  { e.preventDefault(); commitSearch(inputValue); }
+    if (e.key === "Escape") { setInput(""); commitSearch(""); }
+  };
+
+  const handleClear = () => { setInput(""); commitSearch(""); inputRef.current?.focus(); };
+
   const handleNavigate = (id: string) => router.push(`/blog/${id}`);
+
+  const SearchBar = (
+    <div className="bl-search-bar">
+      <span className="bl-search-icon"><SearchIcon /></span>
+      <input
+        ref={inputRef}
+        className="bl-search-input"
+        type="text"
+        placeholder="Search blogs by title, tag or category..."
+        value={inputValue}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        autoComplete="off"
+        spellCheck={false}
+      />
+      {searchQuery && (
+        <span className="bl-search-count">
+          {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+        </span>
+      )}
+      {inputValue && (
+        <button className="bl-search-clear" onClick={handleClear} aria-label="Clear">×</button>
+      )}
+      <button
+        className="bl-search-submit"
+        onClick={() => commitSearch(inputValue)}
+        aria-label="Search"
+        title="Search"
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </button>
+    </div>
+  );
 
   return (
     <>
@@ -285,27 +287,79 @@ export default function BlogPage() {
         .bl-status-text { font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
         .bl-heading { font-family:'Bebas Neue',sans-serif; font-size:clamp(56px,10vw,120px); line-height:.92; letter-spacing:.02em; color:#f0ece4; margin-bottom:20px; opacity:0; }
         .bl-heading .h-accent { color:var(--accent); }
-        .bl-role-line { font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:.08em; text-transform:uppercase; color:#e8e4dc; margin-bottom:40px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; opacity:0; }
+        .bl-role-line { font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:.08em; text-transform:uppercase; color:#e8e4dc; margin-bottom:32px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; opacity:0; }
         .bl-role-line::before { content:''; width:28px; height:1px; background:var(--accent); flex-shrink:0; }
 
-        /* Category tabs */
-        .bl-categories { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:36px; align-items:center; }
-        .bl-cat-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#5a5a54; margin-right:4px; flex-shrink:0; }
-        .bl-cat-btn { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.07em; text-transform:uppercase; padding:8px 18px; border-radius:3px; cursor:pointer; border:1px solid #1c1c1a; background:transparent; color:#5a5a50; transition:all 0.2s; }
-        .bl-cat-btn:hover { border-color:rgba(var(--accent-rgb),0.35); color:var(--accent); background:rgba(var(--accent-rgb),0.05); }
-        .bl-cat-btn.active { background:rgba(var(--accent-rgb),0.12); border-color:rgba(var(--accent-rgb),0.45); color:var(--accent); box-shadow:0 0 12px rgba(var(--accent-rgb),0.1); }
-        .bl-cat-count { display:inline-flex; align-items:center; justify-content:center; background:rgba(var(--accent-rgb),0.15); border-radius:4px; padding:1px 6px; font-size:9px; margin-left:6px; color:var(--accent); font-weight:700; }
+        /* ── Search bar ── */
+        .bl-search-wrap { margin-bottom:36px; }
+        .bl-search-bar {
+          display:flex; align-items:center; gap:10px;
+          background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);
+          border-radius:8px; padding:11px 16px;
+          transition:border-color 0.2s, box-shadow 0.2s;
+        }
+        .bl-search-bar:focus-within {
+          border-color:rgba(var(--accent-rgb),0.45);
+          box-shadow:0 0 0 3px rgba(var(--accent-rgb),0.08);
+        }
+        .bl-search-icon { color:#5a5a54; flex-shrink:0; display:flex; }
+        .bl-search-input {
+          flex:1; background:none; border:none; outline:none;
+          font-family:'JetBrains Mono',monospace; font-size:13px;
+          letter-spacing:0.04em; color:#e8e4dc; min-width:0;
+        }
+        .bl-search-input::placeholder { color:#666660; }
+        .bl-search-submit {
+          display:flex; align-items:center; justify-content:center;
+          width:30px; height:30px; border-radius:6px; flex-shrink:0;
+          background:rgba(var(--accent-rgb),0.12); border:1px solid rgba(var(--accent-rgb),0.3);
+          color:var(--accent); cursor:pointer;
+          transition:background 0.18s, transform 0.15s;
+        }
+        .bl-search-submit:hover { background:rgba(var(--accent-rgb),0.22); transform:scale(1.06); }
+        .bl-search-submit:active { transform:scale(0.95); }
+        .bl-search-clear {
+          background:none; border:none; cursor:pointer;
+          color:#5a5a54; font-size:20px; line-height:1;
+          padding:0 2px; transition:color 0.15s; flex-shrink:0;
+        }
+        .bl-search-clear:hover { color:var(--accent); }
+        .bl-search-count {
+          font-family:'JetBrains Mono',monospace; font-size:10px;
+          letter-spacing:0.06em; color:var(--accent); white-space:nowrap;
+          flex-shrink:0; background:rgba(var(--accent-rgb),0.1);
+          border:1px solid rgba(var(--accent-rgb),0.2); border-radius:4px;
+          padding:2px 8px;
+        }
+
+        /* Fixed search — applied via JS when stuck on mobile */
+        @keyframes blSearchDrop {
+          from { transform:translateY(-100%); opacity:0; }
+          to   { transform:translateY(0);     opacity:1; }
+        }
+        .bl-search-fixed {
+          position:fixed; top:62px; left:0; right:0; z-index:900;
+          background:rgba(8,8,8,0.97);
+          backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+          border-bottom:1px solid rgba(255,255,255,0.07);
+          padding:10px 20px;
+          animation:blSearchDrop 0.22s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+        .bl-search-fixed .bl-search-bar {
+          max-width:1100px; margin:0 auto;
+          background:rgba(255,255,255,0.05);
+        }
+        .bl-search-spacer { height:57px; margin-bottom:36px; }
 
         /* Grid */
         .bl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
 
-        /* Image area */
+        /* Image */
         .bl-img-wrap { aspect-ratio:16/9; min-height:140px; max-height:220px; background:#080808; border-bottom:1px solid #1a1a18; position:relative; overflow:hidden; flex-shrink:0; }
         .bl-img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition:transform .4s ease; }
         .bl-img-ph { width:100%; height:100%; background:linear-gradient(135deg,#0c0c0a 0%,#1a1a16 50%,#0f0f0d 100%); display:flex; align-items:center; justify-content:center; }
         .bl-img-ph-text { font-family:'Bebas Neue',sans-serif; font-size:48px; color:rgba(var(--accent-rgb),0.07); letter-spacing:0.06em; user-select:none; }
-        .bl-img-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.35) 55%,rgba(0,0,0,0) 100%); display:flex; align-items:flex-end; padding:14px 16px; z-index:2; }
-        .bl-img-title { font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; color:#fff; line-height:1.35; text-shadow:0 2px 10px rgba(0,0,0,0.8); margin:0; width:100%; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .bl-img-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.15) 55%,rgba(0,0,0,0) 100%); z-index:2; pointer-events:none; }
 
         /* Card body */
         .bl-card-body { padding:18px 20px; display:flex; flex-direction:column; gap:10px; flex:1; min-width:0; }
@@ -334,10 +388,12 @@ export default function BlogPage() {
         .bl-page-btn:disabled { opacity:0.25; cursor:not-allowed; }
         .bl-page-info { font-family:'JetBrains Mono',monospace; font-size:10px; color:#5a5a54; letter-spacing:0.08em; text-transform:uppercase; padding:0 8px; }
 
-        /* Empty state */
+        /* Empty / no results */
         .bl-empty { text-align:center; padding:80px 20px; grid-column:1/-1; }
-        .bl-empty-title { font-family:'Bebas Neue',sans-serif; font-size:36px; color:#2a2a28; letter-spacing:0.04em; margin-bottom:8px; }
-        .bl-empty-sub { font-family:'JetBrains Mono',monospace; font-size:11px; color:#2a2a28; letter-spacing:0.08em; text-transform:uppercase; }
+        .bl-empty-icon { font-size:48px; margin-bottom:16px; opacity:0.4; }
+        .bl-empty-title { font-family:'Bebas Neue',sans-serif; font-size:38px; color:#8a8a84; letter-spacing:0.04em; margin-bottom:10px; }
+        .bl-empty-sub { font-family:'JetBrains Mono',monospace; font-size:12px; color:#6a6a62; letter-spacing:0.08em; text-transform:uppercase; }
+        .bl-empty-query { color:var(--accent); }
 
         /* Responsive */
         @media (max-width:767px) {
@@ -352,15 +408,15 @@ export default function BlogPage() {
           .bl-role-line::before{width:20px}
           .bl-card-body{padding:16px 18px}
           .bl-page-btn{padding:7px 12px;font-size:10px}
+          .bl-search-fixed{padding:10px 16px}
         }
-        @media (hover:none) {
-          .bl-read-link:hover{opacity:1}
-        }
+        @media (hover:none) { .bl-read-link:hover{opacity:1} }
       `}</style>
 
       <section id="blog">
         <div className="page-card">
           <div className="bl-inner">
+
             {/* Heading */}
             <div ref={headingRef}>
               <div className="bl-status-tag">
@@ -371,21 +427,16 @@ export default function BlogPage() {
               <div className="bl-role-line">Dev notes, tutorials, and random thoughts</div>
             </div>
 
-            {/* Category tabs */}
-            {!fetching && categories.length > 1 && (
-              <div className="bl-categories">
-                <span className="bl-cat-label">Browse //</span>
-                {categories.map((cat) => {
-                  const count = cat === "All" ? blogs.length : blogs.filter((b) => b.category === cat).length;
-                  return (
-                    <button key={cat} onClick={() => handleCategoryChange(cat)}
-                      className={`bl-cat-btn${activeCategory === cat ? " active" : ""}`}>
-                      {cat}<span className="bl-cat-count">{count}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+            {/* Sentinel — IntersectionObserver watches this to detect when search bar scrolls past nav */}
+            <div ref={sentinelRef} style={{ height: 0 }} />
+
+            {/* Spacer replaces the search bar's space when it goes fixed */}
+            {stuck && <div className="bl-search-spacer" />}
+
+            {/* Search bar — rendered inline normally, teleported to fixed when stuck */}
+            <div className={stuck ? "bl-search-fixed" : "bl-search-wrap"}>
+              {SearchBar}
+            </div>
 
             {/* Grid */}
             <div className="bl-grid">
@@ -393,8 +444,16 @@ export default function BlogPage() {
                 Array.from({ length: 6 }).map((_, i) => <BlogCardSkeleton key={i} />)
               ) : filtered.length === 0 ? (
                 <div className="bl-empty">
-                  <div className="bl-empty-title">No Posts Yet</div>
-                  <div className="bl-empty-sub">{"// Coming soon — check back later"}</div>
+                  <div className="bl-empty-icon">{searchQuery ? "🔍" : "📝"}</div>
+                  <div className="bl-empty-title">
+                    {searchQuery ? "No Results Found" : "No Posts Yet"}
+                  </div>
+                  <div className="bl-empty-sub">
+                    {searchQuery
+                      ? <>nothing matched &ldquo;<span className="bl-empty-query">{searchQuery}</span>&rdquo;</>
+                      : "// coming soon — check back later"
+                    }
+                  </div>
                 </div>
               ) : (
                 paginated.map((blog, i) => (
@@ -425,6 +484,7 @@ export default function BlogPage() {
                 <button className="bl-page-btn" onClick={() => setPage((p) => p + 1)} disabled={page === totalPages}>Next →</button>
               </div>
             )}
+
           </div>
         </div>
       </section>
