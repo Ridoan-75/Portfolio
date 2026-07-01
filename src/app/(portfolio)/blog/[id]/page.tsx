@@ -388,6 +388,9 @@ export default function BlogDetailPage() {
         .bd-body h3 { font-size: 1.2em; }
         .bd-body h4 { font-size: .95em; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); }
         .bd-body p { margin: 0 0 1.4em; }
+        .bd-body [data-text-align="center"] { text-align: center; }
+        .bd-body [data-text-align="right"] { text-align: right; }
+        .bd-body [data-text-align="justify"] { text-align: justify; }
         .bd-body strong { color: #e0dcd4; font-weight: 700; }
         .bd-body em { color: #ccc8c0; }
         .bd-body a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; transition: opacity .2s; }

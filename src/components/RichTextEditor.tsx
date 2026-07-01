@@ -141,6 +141,7 @@ export default function RichTextEditor({ value, onChange, placeholder = "Write y
         .rte-content hr { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 2em 0; }
         .rte-content [data-text-align="center"] { text-align: center; }
         .rte-content [data-text-align="right"] { text-align: right; }
+        .rte-content [data-text-align="justify"] { text-align: justify; }
         .rte-content .is-editor-empty:first-child::before { content: attr(data-placeholder); color: rgba(255,255,255,0.2); pointer-events: none; float: left; height: 0; }
         .rte-wordcount { padding: 5px 14px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.05); font-size: 11px; color: rgba(255,255,255,0.22); text-align: right; }
       `}</style>
@@ -202,6 +203,7 @@ export default function RichTextEditor({ value, onChange, placeholder = "Write y
           <ToolbarBtn title="Align left" active={editor.isActive({ textAlign: "left" })} onClick={() => editor.chain().focus().setTextAlign("left").run()}>⬅</ToolbarBtn>
           <ToolbarBtn title="Align center" active={editor.isActive({ textAlign: "center" })} onClick={() => editor.chain().focus().setTextAlign("center").run()}>⬛</ToolbarBtn>
           <ToolbarBtn title="Align right" active={editor.isActive({ textAlign: "right" })} onClick={() => editor.chain().focus().setTextAlign("right").run()}>➡</ToolbarBtn>
+          <ToolbarBtn title="Justify" active={editor.isActive({ textAlign: "justify" })} onClick={() => editor.chain().focus().setTextAlign("justify").run()}>☰</ToolbarBtn>
           <Divider />
 
           {/* Link & Image */}

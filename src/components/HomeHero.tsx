@@ -183,6 +183,7 @@ export default function HomeHero() {
           max-width: 100%;
           overflow: hidden;
           box-sizing: border-box;
+          opacity: 0;
         }
         .home-divider { height: 1px; background: rgba(255,255,255,0.06); flex-shrink: 0; }
 
@@ -200,6 +201,7 @@ export default function HomeHero() {
           flex-direction: column;
           gap: clamp(10px, 1.4vw, 18px);
           min-width: 0;
+          opacity: 0;
         }
         .home-eyebrow {
           font-family: 'JetBrains Mono', monospace;
@@ -377,27 +379,34 @@ export default function HomeHero() {
 
         /* ── Blog card ── */
         .blog-carousel-card {
-          background: rgba(255,255,255,0.04);
-          -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-          border: 1px solid rgba(255,255,255,0.10);
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 24px rgba(0,0,0,0.35);
-          border-radius: 14px;
+          background: linear-gradient(145deg, rgba(22,22,20,0.96) 0%, rgba(16,16,14,0.98) 100%);
+          border: 1px solid rgba(255,255,255,0.09);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.5);
+          border-radius: 6px;
           overflow: hidden;
           display: flex;
           flex-direction: column;
           width: 100%;
           max-width: 100%;
           box-sizing: border-box;
-          transition: border-color 0.25s, box-shadow 0.25s;
+          transition: border-color 0.3s ease, box-shadow 0.35s ease;
         }
         .cf-card-wrap.cf-center .blog-carousel-card:hover {
-          border-color: rgba(var(--accent-rgb),0.28);
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 16px 48px rgba(0,0,0,0.5), 0 0 28px rgba(var(--accent-rgb),0.1);
+          border-color: rgba(var(--accent-rgb),0.35);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 8px 40px rgba(0,0,0,0.5), 0 0 32px rgba(var(--accent-rgb),0.1);
         }
         .hb-img-wrap {
           position: relative; overflow: hidden;
-          background: #0e0e0c; aspect-ratio: 16/9; flex-shrink: 0;
+          background: #080808; aspect-ratio: 16/9; flex-shrink: 0;
           width: 100%;
+          border-bottom: 1px solid #1a1a18;
+        }
+        .hb-img-grid {
+          position: absolute; inset: 0; z-index: 0; pointer-events: none;
+          background-image:
+            linear-gradient(rgba(var(--accent-rgb),.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(var(--accent-rgb),.04) 1px, transparent 1px);
+          background-size: 28px 28px;
         }
         .hb-img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform 0.4s ease; }
         .cf-card-wrap.cf-center .blog-carousel-card:hover .hb-img { transform: scale(1.05); }
@@ -411,38 +420,44 @@ export default function HomeHero() {
           color: rgba(var(--accent-rgb),0.07); letter-spacing: 0.06em; user-select: none;
         }
         .hb-img-overlay {
-          position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.35) 55%, transparent 100%);
-          display: flex; align-items: flex-end; padding: 14px 16px;
+          position: absolute; inset: 0; z-index: 1; pointer-events: none;
+          background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0) 100%);
         }
-        .hb-img-title {
-          font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
-          color: #fff; line-height: 1.35; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-          margin: 0; width: 100%;
-          display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-          word-break: break-word;
+        .hb-year-badge {
+          position: absolute; top: 8px; right: 8px; z-index: 2;
+          padding: 3px 9px; background: rgba(8,8,8,0.85);
+          border: 1px solid rgba(var(--accent-rgb),0.2); border-radius: 3px;
+          font-size: 10px; font-family: 'JetBrains Mono', monospace;
+          color: var(--accent); letter-spacing: 0.08em;
+        }
+        .hb-cat-badge {
+          position: absolute; top: 8px; left: 8px; z-index: 2;
+          padding: 3px 8px; background: rgba(8,8,8,0.85);
+          border: 1px solid rgba(var(--accent-rgb),0.25); border-radius: 3px;
+          font-size: 9px; font-family: 'JetBrains Mono', monospace;
+          color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600;
         }
         .hb-body {
-          padding: clamp(12px, 1.2vw, 16px) clamp(14px, 1.4vw, 18px) clamp(14px, 1.4vw, 18px);
-          display: flex; flex-direction: column; gap: clamp(7px, 0.7vw, 10px); flex: 1; min-width: 0;
+          padding: clamp(14px, 1.4vw, 18px) clamp(16px, 1.6vw, 20px);
+          display: flex; flex-direction: column; gap: clamp(8px, 0.8vw, 10px); flex: 1; min-width: 0;
         }
         .hb-title {
-          font-family: 'DM Sans', sans-serif; font-size: clamp(13px, 1.1vw, 15px); font-weight: 700;
-          color: #f0ece4; line-height: 1.45; margin: 0;
+          font-family: 'Bebas Neue', sans-serif; font-size: clamp(17px, 1.6vw, 20px); font-weight: 400;
+          letter-spacing: 0.04em; color: #f0ece4; line-height: 1.2; margin: 0;
           display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
           word-break: break-word;
         }
         .hb-meta-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-        .hb-date { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #7a7870; letter-spacing: 0.06em; }
-        .hb-views { display: flex; align-items: center; gap: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #7a7870; }
+        .hb-date { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #807c74; letter-spacing: 0.06em; }
+        .hb-views { display: flex; align-items: center; gap: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #807c74; }
         .hb-excerpt {
-          font-size: clamp(11px, 0.9vw, 13px); color: #9a9890; line-height: 1.65; margin: 0; flex: 1;
+          font-size: clamp(12px, 1vw, 13px); color: #9a9890; line-height: 1.75; margin: 0; flex: 1;
           display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
           word-break: break-word;
         }
         .hb-footer {
           display: flex; align-items: center; justify-content: space-between; gap: 10px;
-          margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);
+          margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06);
         }
         .hb-read-btn {
           font-family: 'JetBrains Mono', monospace; font-size: 10px;
@@ -453,9 +468,9 @@ export default function HomeHero() {
         .hb-read-btn:hover { opacity: 0.75; }
         .hb-badge {
           font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.12em;
-          text-transform: uppercase; padding: 3px 9px;
+          text-transform: uppercase; padding: 4px 10px;
           background: rgba(var(--accent-rgb),0.09); border: 1px solid rgba(var(--accent-rgb),0.22);
-          border-radius: 5px; color: var(--accent); flex-shrink: 0; white-space: nowrap;
+          border-radius: 3px; color: var(--accent); flex-shrink: 0; white-space: nowrap;
         }
         .blog-empty {
           font-family: 'JetBrains Mono', monospace; font-size: 11px;
@@ -739,14 +754,15 @@ export default function HomeHero() {
                   >
                     <div className="blog-carousel-card">
                       <div className="hb-img-wrap">
+                        <div className="hb-img-grid" />
                         {b.thumbnail ? (
                           <img src={b.thumbnail} alt={b.title} className="hb-img" />
                         ) : (
                           <div className="hb-img-ph"><span className="hb-img-ph-text">BLOG</span></div>
                         )}
-                        <div className="hb-img-overlay">
-                          <h3 className="hb-img-title">{b.title}</h3>
-                        </div>
+                        <div className="hb-img-overlay" />
+                        <div className="hb-year-badge">{new Date(b.createdAt).getFullYear()}</div>
+                        {b.category && <div className="hb-cat-badge">{b.category}</div>}
                       </div>
                       <div className="hb-body">
                         <h2 className="hb-title">{b.title}</h2>
@@ -758,8 +774,8 @@ export default function HomeHero() {
                         </div>
                         {b.content && <p className="hb-excerpt">{plainText(b.content)}</p>}
                         <div className="hb-footer">
-                          <span className="hb-read-btn">Read Full Blog</span>
-                          <span className="hb-badge">{b.category || "BLOG"}</span>
+                          <span className="hb-read-btn">Read Full Blog →</span>
+                          <span className="hb-badge">BLOG</span>
                         </div>
                       </div>
                     </div>

@@ -172,6 +172,7 @@ export default function About() {
 
   const switchSection = useCallback((id: Section) => {
     if (id === active) return;
+    headingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     const el = contentRef.current;
     if (!el) { setActive(id); return; }
     gsap.to(el, {
@@ -302,7 +303,7 @@ export default function About() {
                             <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
                             <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
                           </svg>
-                          <span>Click to view</span>
+                          <span>Click to enlarge</span>
                         </div>
                       </>
                     : <div className="ab-cert-img-ph"><span className="ab-cert-ph-txt">CERT</span></div>
@@ -528,16 +529,12 @@ export default function About() {
           position:absolute; bottom:0; left:0; right:0;
           display:flex; align-items:center; justify-content:center; gap:7px;
           padding:10px 14px 12px;
-          background:linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
-          color:rgba(255,255,255,0.9); font-family:'JetBrains Mono',monospace;
+          background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 100%);
+          color:rgba(255,255,255,0.95); font-family:'JetBrains Mono',monospace;
           font-size:10px; letter-spacing:.1em; text-transform:uppercase;
-          opacity:0; transform:translateY(6px);
+          opacity:1; transform:translateY(0);
           transition:opacity .25s, transform .25s;
           pointer-events:none;
-        }
-        .ab-cert-img-clickable:hover .ab-cert-img-hint { opacity:1; transform:translateY(0); }
-        @media (hover: none) {
-          .ab-cert-img-clickable .ab-cert-img-hint { opacity:1; transform:translateY(0); }
         }
         .ab-cert-body { padding:18px 20px; display:flex; flex-direction:column; gap:10px; flex:1; min-width:0; }
         .ab-cert-info { display:flex; flex-direction:column; gap:5px; min-width:0; }
